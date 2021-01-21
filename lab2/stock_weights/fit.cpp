@@ -1,10 +1,9 @@
 #include <TMB.hpp>
-#include <iostream>
+// #include <iostream>
 
 template <class Type>
 Type objective_function<Type>::operator()()
 {
-
   //input data;
   DATA_VECTOR(x);
   DATA_VECTOR(se);
@@ -41,13 +40,12 @@ Type objective_function<Type>::operator()()
   Type std_dev = std(2);
 
   //containers
-
   vector<Type> Ex(n);
   vector<Type> resid(n);
   vector<Type> std_resid(n);
 
   //initialize the negative log likelihood
-  Type nll = zero;
+  Type nll = 0;
   using namespace density;
 
   for (int i = 0; i < n; ++i)
@@ -93,6 +91,7 @@ Type objective_function<Type>::operator()()
   REPORT(std_year_eff);
   REPORT(std_cohort_eff);
   REPORT(std_dev);
+  REPORT(nll);
 
   ADREPORT(log_pred_wt);
 
