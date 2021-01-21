@@ -1,4 +1,4 @@
-setwd("C:\home\CADIGAN\GradProgram\2021\F6005\Lab2\stock_weights")
+setwd("D:/OneDrive - University of Tasmania/HOANG.Ng84/Education/Hoang.MUN20/Required courses/Fish 6005/labs/F6005/F6005/lab2/stock_weights")
 
 require(reshape2) 
 library(stringr) 
