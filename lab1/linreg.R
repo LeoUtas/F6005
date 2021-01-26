@@ -1,31 +1,43 @@
-setwd("D:/OneDrive - University of Tasmania/HOANG.Ng84/Education/Hoang.MUN20/Required courses/Fish 6005/labs/lab1")
-
 library(TMB)
+
+setwd("C:\\home\\CADIGAN\\GradProgram\\2021\\F6005\\lab1")
+
 compile("linreg.cpp")
-dyn.load(dynlib("linreg"))
 
-set.seed(123)
-beta_0 <- 1
-beta_1 <- 2
-beta_2 <- .5
-sd_er <- 3
-n <- 100
+dyn.load(dynlib("linreg")) 
+#dyn.unload(dynlib("linreg"))
 
-tmb_data <- list(x1 = 1:n, x2 = rpois(n, 10))
-tmb_data$y <- beta_0 + beta_1 * tmb_data$x + beta_2 sd_er * rnorm(n)
 
-data <- list(Y = rnorm(10) + 1:10, x = 1:10)
-parameters <- list(a = 1, b = 2, logSigma = 3)
+beta0=1
+beta1=2  
+beta2=-0.5
+sd_err = 1
+n=50
 
-obj <- MakeADFun(data, parameters, DLL = "linreg")
-obj$hessian <- TRUE
-opt <- do.call("optim", obj)
+set.seed(123)     
+tmb.data <- list(x1=sort(rnorm(n)*2))
+tmb.data$x2 = (tmb.data$x1-mean(tmb.data$x1))**2
 
-opt
-opt$hessian ## <-- FD hessian from optim
-obj$he() ## <-- Analytical hessian
-sdreport(obj)
+tmb.data$Y = beta0 + beta1*tmb.data$x1 + beta2*tmb.data$x2 + sd_err*rnorm(n)
 
-lm(tmb_data$y ~ tmb_data$x)
+plot(tmb.data$x1,tmb.data$Y)
 
-tmb_data$y
+parameters <- list(beta0=0, beta1=1, beta2=2, logSigma=0)
+
+obj <- MakeADFun(tmb.data, parameters, DLL="linreg")
+#obj$hessian <- TRUE
+
+obj$gr(obj$par)
+
+opt <- nlminb(obj$par,obj$fn,obj$gr)
+
+rep = obj$report();
+
+
+#opt$hessian ## <-- FD hessian from optim
+#obj$he()    ## <-- Analytical hessian
+sdrep = sdreport(obj)
+
+lines(tmb.data$x1,rep$mu,col='red',lwd=2) 
+lines(tmb.data$x1,rep$mu - qnorm(0.975)*sdrep$sd,col='red',lwd=2,lty=2)
+lines(tmb.data$x1,rep$mu + qnorm(0.975)*sdrep$sd,col='red',lwd=2,lty=2)
