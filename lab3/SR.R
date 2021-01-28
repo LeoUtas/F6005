@@ -1,46 +1,42 @@
-
+setwd("D:/OneDrive - University of Tasmania/HOANG.Ng84/Education/Hoang.MUN20/Required courses/Fish 6005/labs/F6005/lab3")
 
 library(nlme)
 library(stargazer)
 
 fname <- c("SR.dat")
-sr.data <- read.table(fname, header = T)
-sr.data$logrec <- log(sr.data$rec)
-sr.data$logssb <- log(sr.data$ssb)
+sr_data <- read.table(fname, header = TRUE)
+sr_data$logrec <- log(sr_data$rec)
+sr_data$logssb <- log(sr_data$ssb)
 
-init.Rmax <- 150
-init.S50 <- 50
-init.alpha <- init.Rmax
-init.beta <- init.S50
+init_Rmax <- 150
+init_S50 <- 50
+init_alpha <- init_Rmax
+init_beta <- init_S50
 
 
-BH.fit <- nls(logrec ~ log(alpha) + logssb - log(beta + ssb),
-  algorithm = "port", lower = c(0, 0), data = sr.data,
-  start = list(beta = init.beta, alpha = init.alpha)
+BH_fit <- nls(logrec ~ log(alpha) + logssb - log(beta + ssb),
+  algorithm = "port", lower = c(0, 0), data = sr_data,
+  start = list(beta = init_beta, alpha = init_alpha), trace = TRUE
 )
 
-
 BH.arfit <- gnls(logrec ~ log(alpha) + logssb - log(beta + ssb),
-  data = sr.data,
-  start = list(beta = init.beta, alpha = init.alpha),
+  data = sr_data,
+  start = list(beta = init_beta, alpha = init_alpha),
   correlation = corAR1(form = ~year)
 )
 
-
 library(TMB)
 
-## autocorrelated errors;
-
+## Autocorrelated errors;
 compile("fit.cpp")
-
 dyn.load("fit")
 # dyn.unload("fit")
 
-tmb.data <- list(
-  ssb = sr.data$ssb,
-  rec = sr.data$rec,
-  lssb = log(sr.data$ssb),
-  lrec = log(sr.data$rec)
+tmb_data <- list(
+  ssb = sr_data$ssb,
+  rec = sr_data$rec,
+  lssb = log(sr_data$ssb),
+  lrec = log(sr_data$rec)
 )
 
 parameters <- list(
@@ -50,9 +46,9 @@ parameters <- list(
   logit_ar_lrec_me = 0
 )
 
-obj <- MakeADFun(tmb.data, parameters,
+obj <- MakeADFun(tmb_data, parameters,
   DLL = "fit",
-  inner.control = list(maxit = 500, trace = T)
+  inner.control = list(maxit = 500, trace = TRUE)
 )
 
 obj$gr(obj$par)
@@ -62,9 +58,9 @@ opt <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = 1))
 obj$gr(opt$par)
 
 rep <- obj$report()
-sd.rep <- sdreport(obj)
+sd_rep <- sdreport(obj)
 
-tab <- cbind(sd.rep$value, sd.rep$sd)
+tab <- cbind(sd_rep$value, sd_rep$sd)
 colnames(tab) <- c("Est", "Sd.err")
 
 stargazer(tab,
@@ -76,18 +72,18 @@ stargazer(tab,
 
 ##########  RW in log alpha ;
 
-n <- nrow(sr.data)
+n <- nrow(sr_data)
 
 compile("fit_saoRW.cpp")
 
 dyn.load("fit_saoRW")
 # dyn.unload("fit_saoRW")
 
-tmb.data <- list(
-  ssb = sr.data$ssb,
-  rec = sr.data$rec,
-  lssb = log(sr.data$ssb),
-  lrec = log(sr.data$rec)
+tmb_data <- list(
+  ssb = sr_data$ssb,
+  rec = sr_data$rec,
+  lssb = log(sr_data$ssb),
+  lrec = log(sr_data$rec)
 )
 
 parameters <- list(
@@ -101,9 +97,9 @@ parameters <- list(
 
 # map <- list(lsd_lrec_me = factor(NA))
 
-obj <- MakeADFun(tmb.data, parameters,
+obj <- MakeADFun(tmb_data, parameters,
   DLL = "fit_saoRW",
-  random = c("lsao_dev"), inner.control = list(maxit = 500, trace = T)
+  random = c("lsao_dev"), inner.control = list(maxit = 500, trace = TRUE)
 )
 
 obj$gr(obj$par)
@@ -113,13 +109,13 @@ opt <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = 1))
 obj$gr(opt$par)
 
 rep <- obj$report()
-sd.rep <- sdreport(obj)
+sd_rep <- sdreport(obj)
 
-sname <- names(sd.rep$value)
+sname <- names(sd_rep$value)
 
 ind <- sname %in% c("lsao", "beta", "sd_lrec_me", "sd_lsao_dev")
 
-tab <- cbind(sd.rep$value[ind], sd.rep$sd[ind])
+tab <- cbind(sd_rep$value[ind], sd_rep$sd[ind])
 colnames(tab) <- c("Est", "Sd.err")
 
 stargazer(tab,
@@ -130,13 +126,13 @@ stargazer(tab,
 
 ind <- sname %in% c("lsao_ts")
 pdat <- data.frame(
-  year = sr.data$year, lsao = sd.rep$value[ind],
-  L95 = sd.rep$value[ind] - qnorm(0.975) * sd.rep$sd[ind],
-  U95 = sd.rep$value[ind] + qnorm(0.975) * sd.rep$sd[ind]
+  year = sr_data$year, lsao = sd_rep$value[ind],
+  L95 = sd_rep$value[ind] - qnorm(0.975) * sd_rep$sd[ind],
+  U95 = sd_rep$value[ind] + qnorm(0.975) * sd_rep$sd[ind]
 )
 
-re <- tab[1, 1] + sd.rep$par.random
-sdre <- sqrt(sd.rep$diag.cov.random)
+re <- tab[1, 1] + sd_rep$par.random
+sdre <- sqrt(sd_rep$diag.cov.random)
 pdat$L95.1 <- re - qnorm(0.975) * sdre
 pdat$U95.1 <- re + qnorm(0.975) * sdre
 
@@ -180,9 +176,9 @@ pfit <- rep(NA, nsd)
 for (i in 1:nsd) {
   parameters$lsd_lrec_me <- log(psd[i])
 
-  obj <- MakeADFun(tmb.data, parameters,
+  obj <- MakeADFun(tmb_data, parameters,
     DLL = "fit_saoRW", map = map,
-    random = c("lsao_dev"), inner.control = list(maxit = 500, trace = F)
+    random = c("lsao_dev"), inner.control = list(maxit = 500, trace = FALSE)
   )
 
   optp <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = 0))
@@ -210,11 +206,11 @@ compile("fit_RK_RW.cpp")
 dyn.load("fit_RK_RW")
 # dyn.unload("fit_RK_RW")
 
-tmb.data <- list(
-  ssb = sr.data$ssb,
-  rec = sr.data$rec,
-  lssb = log(sr.data$ssb),
-  lrec = log(sr.data$rec)
+tmb_data <- list(
+  ssb = sr_data$ssb,
+  rec = sr_data$rec,
+  lssb = log(sr_data$ssb),
+  lrec = log(sr_data$rec)
 )
 
 parameters <- list(
@@ -225,9 +221,9 @@ parameters <- list(
   lalpha_dev = rep(0, n)
 )
 
-obj <- MakeADFun(tmb.data, parameters,
+obj <- MakeADFun(tmb_data, parameters,
   DLL = "fit_RK_RW",
-  random = c("lalpha_dev"), inner.control = list(maxit = 500, trace = T)
+  random = c("lalpha_dev"), inner.control = list(maxit = 500, trace = TRUE)
 )
 opt <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = 1))
 
@@ -251,7 +247,7 @@ stargazer(tab,
 
 ind <- sname %in% c("lsao_ts")
 pdat <- data.frame(
-  year = sr.data$year, lsao = sd.rep$value[ind],
+  year = sr_data$year, lsao = sd.rep$value[ind],
   L95 = sd.rep$value[ind] - qnorm(0.975) * sd.rep$sd[ind],
   U95 = sd.rep$value[ind] + qnorm(0.975) * sd.rep$sd[ind]
 )
@@ -294,9 +290,9 @@ pfit <- rep(NA, nsd)
 for (i in 1:nsd) {
   parameters$lsd_lrec_me <- log(psd[i])
 
-  obj <- MakeADFun(tmb.data, parameters,
+  obj <- MakeADFun(tmb_data, parameters,
     DLL = "fit_RK_RW", map = map,
-    random = c("lalpha_dev"), inner.control = list(maxit = 500, trace = F)
+    random = c("lalpha_dev"), inner.control = list(maxit = 500, trace = FALSE)
   )
 
   optp <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = 0))
@@ -320,22 +316,22 @@ dev.off()
 ## fixed rec ME CV;
 map <- list(lsd_lrec_me = factor(NA))
 
-obj <- MakeADFun(tmb.data, parameters,
+obj <- MakeADFun(tmb_data, parameters,
   DLL = "fit_RK_RW", map = map,
-  random = c("lalpha_dev"), inner.control = list(maxit = 500, trace = T)
+  random = c("lalpha_dev"), inner.control = list(maxit = 500, trace = TRUE)
 )
 opt <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = 1))
 
 obj$gr(opt$par)
 
 rep <- obj$report()
-sd.rep <- sdreport(obj)
+sd_rep <- sdreport(obj)
 
-sname <- names(sd.rep$value)
+sname <- names(sd_rep$value)
 
 ind <- sname %in% c("alpha_main", "beta", "sd_lrec_me", "sd_lalpha_dev")
 
-tab <- cbind(sd.rep$value[ind], sd.rep$sd[ind])
+tab <- cbind(sd_rep$value[ind], sd_rep$sd[ind])
 colnames(tab) <- c("Est", "Sd.err")
 
 stargazer(tab,
@@ -346,9 +342,9 @@ stargazer(tab,
 
 ind <- sname %in% c("lsao_ts")
 pdat <- data.frame(
-  year = sr.data$year, lsao = sd.rep$value[ind],
-  L95 = sd.rep$value[ind] - qnorm(0.975) * sd.rep$sd[ind],
-  U95 = sd.rep$value[ind] + qnorm(0.975) * sd.rep$sd[ind]
+  year = sr_data$year, lsao = sd_rep$value[ind],
+  L95 = sd_rep$value[ind] - qnorm(0.975) * sd_rep$sd[ind],
+  U95 = sd_rep$value[ind] + qnorm(0.975) * sd_rep$sd[ind]
 )
 
 gname <- "RKsaoRW_recMEfixed.jpeg"
@@ -383,11 +379,11 @@ compile("fit_RK_AR1.cpp")
 dyn.load("fit_RK_AR1")
 # dyn.unload("fit_RK_AR1")
 
-tmb.data <- list(
-  ssb = sr.data$ssb,
-  rec = sr.data$rec,
-  lssb = log(sr.data$ssb),
-  lrec = log(sr.data$rec)
+tmb_data <- list(
+  ssb = sr_data$ssb,
+  rec = sr_data$rec,
+  lssb = log(sr_data$ssb),
+  lrec = log(sr_data$rec)
 )
 
 parameters <- list(
@@ -401,9 +397,9 @@ parameters <- list(
 
 map <- list(lsd_lrec_me = factor(NA))
 
-obj <- MakeADFun(tmb.data, parameters,
+obj <- MakeADFun(tmb_data, parameters,
   DLL = "fit_RK_AR1", map = map,
-  random = c("lalpha_dev"), inner.control = list(maxit = 500, trace = T)
+  random = c("lalpha_dev"), inner.control = list(maxit = 500, trace = TRUE)
 )
 
 obj$gr(obj$par)
@@ -414,17 +410,17 @@ obj$gr(opt$par)
 
 rep <- obj$report()
 
-plot(tmb.data$rec)
+plot(tmb_data$rec)
 lines(rep$mu)
 
 
-sd.rep <- sdreport(obj)
+sd_rep <- sdreport(obj)
 
-sname <- names(sd.rep$value)
+sname <- names(sd_rep$value)
 
 ind <- sname %in% c("alpha_main", "beta", "sd_lrec_me", "sd_lalpha_dev")
 
-tab <- cbind(sd.rep$value[ind], sd.rep$sd[ind])
+tab <- cbind(sd_rep$value[ind], sd_rep$sd[ind])
 colnames(tab) <- c("Est", "Sd.err")
 
 stargazer(tab,
@@ -435,13 +431,13 @@ stargazer(tab,
 
 ind <- sname %in% c("lsao_ts")
 pdat <- data.frame(
-  year = sr.data$year, lsao = sd.rep$value[ind],
-  L95 = sd.rep$value[ind] - qnorm(0.975) * sd.rep$sd[ind],
-  U95 = sd.rep$value[ind] + qnorm(0.975) * sd.rep$sd[ind]
+  year = sr_data$year, lsao = sd_rep$value[ind],
+  L95 = sd_rep$value[ind] - qnorm(0.975) * sd_rep$sd[ind],
+  U95 = sd_rep$value[ind] + qnorm(0.975) * sd_rep$sd[ind]
 )
 
-re <- opt$par[1] + sd.rep$par.random
-sdre <- sqrt(sd.rep$diag.cov.random)
+re <- opt$par[1] + sd_rep$par.random
+sdre <- sqrt(sd_rep$diag.cov.random)
 pdat$L95.1 <- re - qnorm(0.975) * sdre
 pdat$U95.1 <- re + qnorm(0.975) * sdre
 
