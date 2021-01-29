@@ -13,7 +13,6 @@ init_S50 <- 50
 init_alpha <- init_Rmax
 init_beta <- init_S50
 
-
 BH_fit <- nls(logrec ~ log(alpha) + logssb - log(beta + ssb),
   algorithm = "port", lower = c(0, 0), data = sr_data,
   start = list(beta = init_beta, alpha = init_alpha), trace = TRUE
@@ -28,26 +27,26 @@ BH.arfit <- gnls(logrec ~ log(alpha) + logssb - log(beta + ssb),
 library(TMB)
 
 ## Autocorrelated errors;
-compile("fit.cpp")
-dyn.load("fit")
-# dyn.unload("fit")
+compile("fit_mess.cpp")
+dyn.load(dynlib("fit_mess"))
+#dyn.unload("fit_mess")
 
 tmb_data <- list(
   ssb = sr_data$ssb,
   rec = sr_data$rec,
-  lssb = log(sr_data$ssb),
-  lrec = log(sr_data$rec)
+  log_ssb = log(sr_data$ssb),
+  log_rec = log(sr_data$rec)
 )
 
 parameters <- list(
-  lalpha = log(150),
-  lbeta = log(50),
-  lsd_lrec_me = log(0.1),
-  logit_ar_lrec_me = 0
+  log_alpha = log(150),
+  log_beta = log(50),
+  log_sd_log_rec_me = log(0.1),
+  logit_ar_log_rec_me = 0
 )
 
 obj <- MakeADFun(tmb_data, parameters,
-  DLL = "fit",
+  DLL = "fit_mess",
   inner.control = list(maxit = 500, trace = TRUE)
 )
 
@@ -82,16 +81,16 @@ dyn.load("fit_saoRW")
 tmb_data <- list(
   ssb = sr_data$ssb,
   rec = sr_data$rec,
-  lssb = log(sr_data$ssb),
-  lrec = log(sr_data$rec)
+  log_ssb = log(sr_data$ssb),
+  log_rec = log(sr_data$rec)
 )
 
 parameters <- list(
-  lsao = log(3),
-  lbeta = log(50),
-  lsd_lrec_me = log(0.1),
-  lsd_lsao_dev = log(0.1),
-  lsao_dev = rep(0, n)
+  log_sao = log(3),
+  log_beta = log(50),
+  log_sd_log_rec_me = log(0.1),
+  log_sd_log_sao_dev = log(0.1),
+  log_sao_dev = rep(0, n)
 )
 
 

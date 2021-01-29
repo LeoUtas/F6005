@@ -11,7 +11,7 @@ beta0 <- 1
 beta1 <- 2
 beta2 <- -0.5
 sd_err <- 1
-n <- 50
+n <- 500
 
 set.seed(123)
 tmb_data <- list(x1 = sort(rnorm(n) * 2))

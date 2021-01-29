@@ -1,64 +1,63 @@
 #include <TMB.hpp>
-#include <iostream>
 
 template <class Type>
 Type objective_function<Type>::operator()()
 {
   DATA_VECTOR(ssb);
   DATA_VECTOR(rec);
-  DATA_VECTOR(lssb);
-  DATA_VECTOR(lrec);
+  DATA_VECTOR(log_ssb);
+  DATA_VECTOR(log_rec);
 
-  PARAMETER(lsao);
-  PARAMETER(lbeta);
-  PARAMETER(lsd_lrec_me);
-  PARAMETER(lsd_lsao_dev);
+  PARAMETER(log_sao);
+  PARAMETER(log_beta);
+  PARAMETER(log_sd_log_rec_me);
+  PARAMETER(log_sd_log_sao_dev);
 
-  PARAMETER_VECTOR(lsao_dev);
+  PARAMETER_VECTOR(log_sao_dev);
 
   int n = ssb.size();
 
-  Type beta = exp(lbeta);
-  vector<Type> alpha = beta * exp(lsao + lsao_dev);
-  Type sd_lrec_me = exp(lsd_lrec_me);
-  Type sd_lsao_dev = exp(lsd_lsao_dev);
+  Type beta = exp(log_beta);
+  vector<Type> alpha = beta * exp(log_sao + log_sao_dev);
+  Type sd_log_rec_me = exp(log_sd_log_rec_me);
+  Type sd_log_sao_dev = exp(log_sd_log_sao_dev);
 
-  vector<Type> mu = alpha * ssb / (beta + ssb);
-  vector<Type> log_mu = log(mu);
+  vector<Type> rec_pred = alpha * ssb / (beta + ssb);
+  vector<Type> log_rec_pred = log(rec_pred);
 
   Type nll = 0.0;
   Type zero = 0.0;
 
-  vector<Type> lrec_resid = lrec - log_mu;
-  vector<Type> lrec_resid_std = lrec_resid / sd_lrec_me;
+  vector<Type> log_rec_resid = log_rec - log_rec_pred;
+  vector<Type> log_rec_resid_std = log_rec_resid / sd_log_rec_me;
 
   // nll for log recruitment;
-  nll -= sum(dnorm(lrec_resid, zero, sd_lrec_me, true));
+  nll -= dnorm(log_rec_resid, zero, sd_log_rec_me, true).sum();
 
   // nll for RW in lalpha_dev;
-  nll -= dnorm(lsao_dev(0), zero, sd_lsao_dev, true);
+  nll -= dnorm(log_sao_dev(0), zero, sd_log_sao_dev, true);
   for (int i = 1; i < n; ++i)
   {
-    nll -= dnorm(lsao_dev(i), lsao_dev(i - 1), sd_lsao_dev, true);
+    nll -= dnorm(log_sao_dev(i), log_sao_dev(i - 1), sd_log_sao_dev, true);
   }
 
   REPORT(alpha);
   REPORT(beta);
-  REPORT(sd_lrec_me);
+  REPORT(sd_log_rec_me);
 
-  REPORT(mu);
-  REPORT(log_mu);
-  REPORT(lrec_resid);
-  REPORT(lrec_resid_std);
+  REPORT(rec_pred);
+  REPORT(log_rec_pred);
+  REPORT(log_rec_resid);
+  REPORT(log_rec_resid_std);
 
-  vector<Type> lsao_ts = lsao + lsao_dev;
+  vector<Type> log_sao_ts = log_sao + log_sao_dev;
 
   ADREPORT(alpha);
-  ADREPORT(lsao);
+  ADREPORT(log_sao);
   ADREPORT(beta);
-  ADREPORT(sd_lrec_me);
-  ADREPORT(sd_lsao_dev);
-  ADREPORT(lsao_ts);
+  ADREPORT(sd_log_rec_me);
+  ADREPORT(sd_log_sao_dev);
+  ADREPORT(log_sao_ts);
 
   return nll;
 }
