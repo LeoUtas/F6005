@@ -1,5 +1,16 @@
 #include <TMB.hpp>
-#include <math.h>
+// #include <math.h>
+
+template <class Type>
+Type power(Type x, int y) // x is defined as Type for later use of unspecified x (line 34)
+{
+  Type result = 1;
+  for (int i = 0; i < y; i++)
+  {
+    result = result * x;
+  }
+  return result;
+}
 
 template <class Type>
 Type objective_function<Type>::operator()()
@@ -20,7 +31,7 @@ Type objective_function<Type>::operator()()
   Type beta = exp(log_beta);
   Type sd_log_rec_me = exp(log_sd_log_rec_me);
   Type ar_log_rec_me = exp(logit_ar_log_rec_me) / (1.0 + exp(logit_ar_log_rec_me));
-  Type st_sd_log_rec_me = sd_log_rec_me / sqrt(1.0 - pow(ar_log_rec_me,2));
+  Type st_sd_log_rec_me = sd_log_rec_me / sqrt(1.0 - power(ar_log_rec_me, 2));
 
   Type nll = 0.0;
   Type zero = 0.0;
