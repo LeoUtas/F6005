@@ -1,0 +1,12 @@
+
+<table style="text-align:center"><caption><strong>Parameter Estimates (natural scale)</strong></caption>
+<tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td>est</td><td>se</td></tr>
+<tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">q(1000s) PT.crust.tr</td><td>0.1477</td><td>0.0333</td></tr>
+<tr><td style="text-align:left">q(1000s) PT.fish.tr</td><td>0.3176</td><td>0.0714</td></tr>
+<tr><td style="text-align:left">q(1000s) SPCORTR8c</td><td>802.4147</td><td>177.8272</td></tr>
+<tr><td style="text-align:left">r</td><td>0.2892</td><td>0.0552</td></tr>
+<tr><td style="text-align:left">K</td><td>26.8205</td><td>4.0404</td></tr>
+<tr><td style="text-align:left">sigma PT.crust.tr</td><td>0.3751</td><td>0.0547</td></tr>
+<tr><td style="text-align:left">sigma PT.fish.tr</td><td>0.3607</td><td>0.0493</td></tr>
+<tr><td style="text-align:left">sigma SPCORTR8c</td><td>0.4277</td><td>0.0555</td></tr>
+<tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr></table>
