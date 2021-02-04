@@ -15,7 +15,7 @@ Type objective_function<Type>::operator()()
   //  DATA_SCALAR(sd_log_r);
   DATA_SCALAR(E_log_Po);
   DATA_SCALAR(sd_log_Po);
-  //  DATA_SCALAR(sd_logC);
+  DATA_SCALAR(sd_logC);
   DATA_IVECTOR(istd);
 
   PARAMETER(log_r);
@@ -27,7 +27,7 @@ Type objective_function<Type>::operator()()
   PARAMETER_VECTOR(log_sd_log_index);
   PARAMETER(log_sd_pe);
   PARAMETER(logit_ar_pe);
-  PARAMETER(log_sd_logC);
+  //PARAMETER(log_sd_logC);
 
   PARAMETER_VECTOR(log_pe);
   PARAMETER_VECTOR(log_H_dev);
@@ -43,7 +43,7 @@ Type objective_function<Type>::operator()()
   Type K = exp(log_K);
   Type sd_rw = exp(log_sd_rw);
   vector<Type> sd_log_index = exp(log_sd_log_index);
-  Type sd_logC = exp(log_sd_logC);
+  //Type sd_logC = exp(log_sd_logC);
   Type sd_pe = exp(log_sd_pe);
   Type ar_pe = exp(logit_ar_pe) / (one + exp(logit_ar_pe));
   vector<Type> pe = exp(log_pe);
@@ -142,6 +142,7 @@ Type objective_function<Type>::operator()()
   REPORT(log_rH);
   REPORT(log_EC);
   REPORT(resid_C);
+  REPORT(sd_logC);
   REPORT(log_Eindex);
   REPORT(Eindex);
   REPORT(resid);

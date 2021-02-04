@@ -1,0 +1,25 @@
+<!-- html table generated in R 4.0.3 by xtable 1.8-4 package -->
+<!-- Thu Feb 04 11:27:25 2021 -->
+<table border=1>
+<caption align="top"> Model results, nll = 15.07 </caption>
+<tr> <th>  </th> <th> est </th> <th> CV </th>  </tr>
+  <tr> <td align="center"> r </td> <td align="right"> 0.449 </td> <td align="right"> 0.580 </td> </tr>
+  <tr> <td align="center"> K (000s) </td> <td align="right"> 18.640 </td> <td align="right"> 0.598 </td> </tr>
+  <tr> <td align="center"> Po </td> <td align="right"> 0.638 </td> <td align="right"> 0.213 </td> </tr>
+  <tr> <td align="center"> q PT.crust.tr </td> <td align="right"> 0.144 </td> <td align="right"> 0.654 </td> </tr>
+  <tr> <td align="center"> q PT.fish.tr </td> <td align="right"> 0.309 </td> <td align="right"> 0.654 </td> </tr>
+  <tr> <td align="center"> q SPCORTR8c </td> <td align="right"> 811.961 </td> <td align="right"> 0.652 </td> </tr>
+  <tr> <td align="center"> std PT.crust.tr </td> <td align="right"> 0.266 </td> <td align="right"> 0.186 </td> </tr>
+  <tr> <td align="center"> std PT.fish.tr </td> <td align="right"> 0.258 </td> <td align="right"> 0.173 </td> </tr>
+  <tr> <td align="center"> std SPCORTR8c </td> <td align="right"> 0.312 </td> <td align="right"> 0.149 </td> </tr>
+  <tr> <td align="center"> sd_pe </td> <td align="right"> 0.158 </td> <td align="right"> 0.180 </td> </tr>
+  <tr> <td align="center"> sd_rw </td> <td align="right"> 0.137 </td> <td align="right"> 0.172 </td> </tr>
+  <tr> <td align="center"> ar_pe </td> <td align="right"> 0.421 </td> <td align="right"> 0.532 </td> </tr>
+  <tr> <td align="center"> Hmsy(%) </td> <td align="right"> 22.453 </td> <td align="right"> 0.580 </td> </tr>
+  <tr> <td align="center"> Bmsy (000s) </td> <td align="right"> 9.320 </td> <td align="right"> 0.598 </td> </tr>
+  <tr> <td align="center"> MSY (000s) </td> <td align="right"> 2.093 </td> <td align="right"> 0.249 </td> </tr>
+  <tr> <td align="center"> H2016(%) </td> <td align="right"> 5.730 </td> <td align="right"> 0.659 </td> </tr>
+  <tr> <td align="center"> B2016 (000s) </td> <td align="right"> 18.182 </td> <td align="right"> 0.659 </td> </tr>
+  <tr> <td align="center"> H2016/Hmsy </td> <td align="right"> 0.255 </td> <td align="right"> 0.406 </td> </tr>
+  <tr> <td align="center"> B2016/Bmsy </td> <td align="right"> 1.951 </td> <td align="right"> 0.261 </td> </tr>
+   </table>

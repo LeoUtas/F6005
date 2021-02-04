@@ -11,7 +11,7 @@ index$iq <- as.numeric(as.factor(index$name)) - 1
 
 tmb.data <- list(
     year = catch$year, C = catch$catch / 1000, index = index$index,
-    iyear = index$iyear, iq = index$iq, name = index$name
+    iyear = index$iyear, iq = index$iq
 )
 
 tmb.data$log_C <- log(tmb.data$C)

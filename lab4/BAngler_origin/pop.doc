@@ -1,5 +1,5 @@
-<!-- html table generated in R 3.4.3 by xtable 1.8-2 package -->
-<!-- Mon Mar 05 19:28:43 2018 -->
+<!-- html table generated in R 4.0.3 by xtable 1.8-4 package -->
+<!-- Thu Feb 04 11:50:38 2021 -->
 <table border=1>
 <caption align="top"> Model output </caption>
 <tr> <th>  </th> <th> Biomass </th> <th> CV(%) </th> <th> H (%) </th> <th> CV(%) </th> <th> B/Bmsy </th> <th> CV(%) </th> <th> H/Hmsy </th> <th> CV(%) </th>  </tr>
