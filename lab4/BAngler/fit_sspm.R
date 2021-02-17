@@ -67,7 +67,8 @@ upper <- unlist(parameters_U)
 rname <- c("log_pe", "log_H_dev")
 
 sspm <- MakeADFun(tmb_data, parameters,
-  random = rname, DLL = "sspm_ar1_sd_logC_fixed",
+  random = rname, 
+  DLL = "sspm_ar1_sd_logC_fixed",
   inner.control = list(maxit = 100, trace = TRUE)
 )
 

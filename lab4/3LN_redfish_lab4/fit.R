@@ -63,8 +63,6 @@ rname = c("log_pe","log_H_dev")
 
 map = list(log_sd_logC = factor(NA))
 
-tmb.data$sd_log_r=0.25
-
 obj <- MakeADFun(tmb.data,parameters,random=rname,DLL="fit",
   map=map,inner.control=list(maxit=100,trace=T))  
 

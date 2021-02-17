@@ -1,5 +1,4 @@
-
-setwd("C:\\home\\CADIGAN\\GradProgram\\2019\\F6005\\Lecture4\\3LN_redfish\\data")
+setwd("D:/OneDrive - University of Tasmania/HOANG.Ng84/Education/Hoang.MUN20/Required courses/Fish 6005/labs/F6005/lab4/3LN_redfish_lab4")
 
 catch <- read.table("catch.txt",header=TRUE, fill = FALSE)
 catch$catch = catch$catch/1000 ## units in Kilo tonnes
@@ -22,3 +21,5 @@ tmb.data$sd_log_r = 0.25
 
   
 save(tmb.data,file='tmb.RData')
+
+tmb.data

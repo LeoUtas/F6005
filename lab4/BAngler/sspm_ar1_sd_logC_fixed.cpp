@@ -47,8 +47,8 @@ Type objective_function<Type>::operator()()
   vector<Type> sd_log_index = exp(log_sd_log_index);
   Type sd_pe = exp(log_sd_pe);
   Type ar_pe = exp(logit_ar_pe) / (one + exp(logit_ar_pe));
-  vector<Type> pe = exp(log_pe);
 
+  vector<Type> pe = exp(log_pe);
   vector<Type> log_P(n);
   vector<Type> P(n);
   vector<Type> log_B(n);
