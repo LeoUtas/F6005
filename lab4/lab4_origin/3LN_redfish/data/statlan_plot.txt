@@ -1,0 +1,24 @@
+
+require("xtable") 
+
+setwd("C:\\home\\CADIGAN\\stocks\\models\\redfish\\data")
+
+#Year,Country,Division,Species,Species_ASFIS,Catch ('000 Kg)
+cnames = c("year","Cntry","Div","Species","ASFIS","catch")
+dat = read.table(file="STATLANT21A_Extraction.csv",sep=",", header = TRUE,skip=6,
+col.names=cnames)
+
+sum.dat = aggregate(dat$catch,list(year=dat$year,div=dat$Div),sum)
+sum.dat = aggregate(dat$catch,list(year=dat$year),sum)
+sum.dat$x =  sum.dat$x/1000
+
+plot(sum.dat$year,sum.dat$x,type='b',xlab='Year',ylab='Catch (Kt)',las=1)
+
+colnames(sum.dat) = c('Year','Catch')
+
+tname = c("NWA catch (Kt)")    
+xdigits = c(1,rep(0,2)); #a digit for rowname, and all rows;
+xalign = c('c',rep('r',2)); # alignment 'l','c', or 'r';
+
+print(xtable(sum.dat,digits=xdigits,caption=tname,align=xalign),type='html',
+  file='NWA_catch.doc',caption.placement="top")  

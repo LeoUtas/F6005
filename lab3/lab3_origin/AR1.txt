@@ -1,0 +1,23 @@
+ar1.phi = 0.99
+sigma_dev = 0.1
+sigma_st = sigma_dev/sqrt(1 - ar1.phi**2)
+n=2500
+
+y = sigma_dev*arima.sim(list(order=c(1,0,0), ar=ar1.phi), n=n,n.start=100)
+
+plot(y)
+abline(h=0,lty=2)
+
+sqrt(var(y))
+sigma_st
+
+diff = y[2:n] - ar1.phi*y[1:(n-1)]
+sqrt(var(diff))
+sigma_dev
+
+
+plot(y,xlim=c(100,130))
+
+acf(y[100:130])
+pacf(y[100:130])
+

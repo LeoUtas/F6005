@@ -33,7 +33,7 @@ Type objective_function<Type>::operator()()
   PARAMETER_VECTOR(log_f);
   PARAMETER_ARRAY(pe);
 
-  // set up computations for some parameters;
+  // parameter transformations;
 
   int Y = mat.cols();
   int A = mat.rows();
