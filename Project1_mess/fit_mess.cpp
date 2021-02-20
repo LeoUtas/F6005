@@ -203,7 +203,8 @@ Type objective_function<Type>::operator()()
   vector<Type> std_len = cv_len * mean_len;
   matrix<Type> pla = pla_func(L, A, Linf, po, vbk, cv_len, age, len_border);
 
-  //compute F; matrix exp() does not work
+  // *** compute F ***
+
   for (j = 0; j < Y; ++j)
   {
     F(0, j) = zero;
@@ -215,9 +216,23 @@ Type objective_function<Type>::operator()()
   }
   Z = F + M;
 
-  vector<Type> log_Rec = log_Rec_dev + log_meanR;
+  // log_F_dev
+  array<Type> log_F_dev1(A - 3, Y); // A-3 because F_1 and F_2 = 0 , and F_A = F_A-1;
+  for (i = 0; i < A - 3; ++i)
+  {
+    for (j = 0; j < Y; ++j)
+    {
+      log_F_dev1(i, j) = log_F_dev(i, j);
+    }
+  }
 
-  // The cohort model;
+  // nll for F_dev ~ AR(1) for age and year
+  nll += SCALE(SEPARABLE(AR1(phi_F_year), AR1(phi_F_age)), std_log_F)(log_F_dev1);
+  // matrix exp() does not work
+
+  // *** the cohort model ***;
+
+  vector<Type> log_Rec = log_Rec_dev + log_meanR;
   //initializing log numbers in  first year
   log_N(0, 0) = log_Rec(0);
   for (i = 1; i < A; ++i)
@@ -242,6 +257,18 @@ Type objective_function<Type>::operator()()
   }
   N_matrix = exp(log_N.array());
 
+  // nll for recruitment deviations in cohort model
+  nll += SCALE(AR1(phi_logR), std_log_R)(log_Rec_dev);
+
+  // nll for process error term
+  for (int j = 0; j < Y - 1; ++j)
+  {
+    for (int i = 0; i < A - 1; ++i)
+    {
+      nll -= dnorm(pe(i, j), zero, std_pe, true);
+    }
+  }
+
   //compute numbers at time of survey (Ns) and catch at age (CNA)
   for (i = 0; i < A; ++i)
   {
@@ -260,9 +287,9 @@ Type objective_function<Type>::operator()()
   matrix<Type> log_NLs = log(NLs.array());
 
   //compute biomass, catch biomass and ssb @ len, and total biomass and ssb;
-  matrix<Type> B_matrix = weight.array() * NL.array();
-  matrix<Type> CB_matrix = weight.array() * CL.array();
-  matrix<Type> SSB_matrix = mat.array() * B_matrix.array();
+  matrix<Type> B_matrix = weight.array() * NL.array();      // survey weight at length for years;
+  matrix<Type> CB_matrix = weight.array() * CL.array();     // catch at length in weight for years;
+  matrix<Type> SSB_matrix = mat.array() * B_matrix.array(); // revise SSB (use female only);
   biomass = B_matrix.colwise().sum();
   ssb = SSB_matrix.colwise().sum();
   vector<Type> catch_biomass = CB_matrix.colwise().sum();
@@ -272,7 +299,8 @@ Type objective_function<Type>::operator()()
   vector<Type> rssb = Y * ssb / sum(ssb);
   vector<Type> q = exp(logq);
 
-  //calculate model predicted survey index and residuals
+  // *** calculate model predicted survey index and residuals ***
+
   for (i = 0; i < n; ++i)
   {
     E_index(i) = 0.0;
@@ -285,7 +313,11 @@ Type objective_function<Type>::operator()()
   resid_index = log_index - Elog_index;
   std_resid_index = resid_index / std_index;
 
-  //calculate model predicted catch and residuals
+  // survey index
+  nll -= dnorm(resid_index, zero, std_index, true).sum();
+
+  // *** calculate model predicted catch and residuals ***
+
   for (i = 0; i < nc; ++i)
   {
     E_catch(i) = 0.0;
@@ -298,39 +330,14 @@ Type objective_function<Type>::operator()()
   resid_catch = log_catch - Elog_catch;
   std_resid_catch = resid_catch / std_catch;
 
-  // *** negative log-likelihoods ***
-  // survey index
-  nll -= dnorm(resid_index, zero, std_index, true).sum();
-
-  // predicted catch
+  // nll for predicted catch
   nll -= dnorm(resid_catch, zero, std_catch, true).sum();
 
-  // catchability ~ logq
+  // nll for catchability ~ logq
   for (i = 3; i < 45; ++i)
   {
     nll -= dnorm(logq(i), logq(i - 1), std_logq, true);
   }
-
-  // recruitment deviations in cohort model
-  nll += SCALE(AR1(phi_logR), std_log_R)(log_Rec_dev);
-
-  //process error negative loglikelihood term
-  //  for(int j = 0;j < Y-1;++j){
-  //    for(int i = 0;i < A-1;++i){
-  //      nll -= dnorm(pe(i,j),zero,std_pe,true);
-  //    }
-  //  }
-
-  //Log_F_dev nll
-  array<Type> log_F_dev1(A - 3, Y); // A-3 because F_1 and F_2 = 0 , and F_A = F_A-1;
-  for (i = 0; i < A - 3; ++i)
-  {
-    for (j = 0; j < Y; ++j)
-    {
-      log_F_dev1(i, j) = log_F_dev(i, j);
-    }
-  }
-  nll += SCALE(SEPARABLE(AR1(phi_F_year), AR1(phi_F_age)), std_log_F)(log_F_dev1);
 
   REPORT(pla);
   REPORT(mean_len);
