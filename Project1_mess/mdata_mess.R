@@ -30,9 +30,9 @@ len_rv <- sort(unique(FRV.vec$Length))
 Lo <- 10
 Hi <- 40
 
-FRV_origin = FRV
-FRV = FRV_origin[,-c(2:6)]            # drop Engels indices;
-nY = ncol(FRV)
+FRV_origin <- FRV
+FRV <- FRV_origin[, -c(2:6)] # drop Engels indices;
+nY <- ncol(FRV)
 
 # aggregate low length group (i.e., <= 10cm)
 ind <- len_rv <= Lo
