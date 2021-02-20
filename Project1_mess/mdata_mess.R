@@ -2,12 +2,8 @@ rm(list = ls())
 
 setwd("D:/OneDrive - University of Tasmania/HOANG.Ng84/Education/Hoang.MUN20/Required courses/Fish 6005/labs/F6005/Project1_mess")
 
-library(reshape2)
-library(stringr)
-library(tidyr)
-
 vec_func <- function(x) {
-  vec_data <- gather(x, "Year", "Catch", -Length)
+  vec_data <- tidyr::gather(x, "Year", "Catch", -Length)
   vec_data$Year <- as.numeric(gsub("X", "", vec_data$Year))
   return(vec_data)
 }

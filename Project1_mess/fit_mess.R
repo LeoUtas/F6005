@@ -9,20 +9,20 @@ library(TMB)
 
 compile("fit_mess.cpp", PKG_CXXFLAGS = "-Wno-ignored-attributes")
 
-# compile("fit_origin.cpp")
-
 dyn.load("fit_mess")
 dyn.unload("fit_origin")
+
 ## set FRV length pattern in catchability;
 L50c <- 17
 L95c <- 22
 b1c <- log(0.95 / 0.05) / (L95c - L50c)
 boc <- -b1c * L50c
 ql <- 5 * exp(boc + b1c * tmb_data$len_mid) / (1 + exp(boc + b1c * tmb_data$len_mid))
-# plot(tmb_data$len_mid,ql,xlab='length',ylab='Catchability Length Pattern',type='l',lwd=2)
+# plot(tmb_data$len_mid,ql,xlab='Length (cm)',ylab='Catchability length pattern',type='l',lwd=2)
 
 A <- tmb_data$A
 Y <- tmb_data$Y
+
 parameters <- list(
   # for pla_func()
   log_Linf = log(35),
@@ -57,8 +57,8 @@ parameters <- list(
   pe = matrix(0, nrow = A - 1, ncol = Y - 1, byrow = T)
 )
 parameters$log_N0 <- parameters$log_meanR - 0.2 * (1:(A - 1))
+# not estimating correlation in rec_devs or any process error at first
 
-# not estimating correlayion in rec devs or any process error at first
 parameters.L <- list(
   # for pla_func()
   log_Linf = log(20),
@@ -117,6 +117,7 @@ parameters.U <- list(
 
 lower <- unlist(parameters.L)
 upper <- unlist(parameters.U)
+
 ql.map <- 1:length(ql)
 ql.map[ql.map > 45] <- 45
 ql.map[ql.map <= 3] <- NA
@@ -128,12 +129,14 @@ F_map <- paste(pdat$year, pdat$age, sep = "_")
 log_F_dev_map <- matrix(F_map, nrow = A - 2, ncol = Y, byrow = F)
 # log_F_dev_map=matrix(NA,nrow=A-1,ncol=Y,byrow=F)
 
-## first run with log_std_log_F fixed to get starting values;
 
+### fix some parameters in TMB model ###
+
+## first run with log_std_log_F fixed to get starting values;
 map <- list(
   log_len_o = factor(NA),
-  # log_vbk = factor(NA),
-  # log_std_log_F = factor(NA),
+  log_vbk = factor(NA),
+  log_std_log_F = factor(NA),
   logit_F_age = factor(NA),
   logit_F_year = factor(NA),
   log_std_pe = factor(NA),
@@ -144,25 +147,31 @@ map <- list(
 )
 
 t.L <- parameters.L
-t.L$log_len_o <- NULL
-# t.L$log_vbk = NULL
-# t.L$log_std_log_F = NULL
-t.L$logit_F_age <- NULL
-t.L$logit_F_year <- NULL
-t.L$log_std_pe <- NULL
-t.L$logit_log_R <- NULL
+{
+  t.L$log_len_o <- NULL
+  t.L$log_vbk = NULL
+  t.L$log_std_log_F = NULL
+  t.L$logit_F_age <- NULL
+  t.L$logit_F_year <- NULL
+  t.L$log_std_pe <- NULL
+  t.L$logit_log_R <- NULL
+}
 lower <- unlist(t.L)
+
 t.U <- parameters.U
-t.U$log_len_o <- NULL
-# t.U$log_vbk = NULL
-# t.U$log_std_log_F = NULL
-t.U$logit_F_age <- NULL
-t.U$logit_F_year <- NULL
-t.U$log_std_pe <- NULL
-t.U$logit_log_R <- NULL
+{
+  t.U$log_len_o <- NULL
+  t.U$log_vbk = NULL
+  t.U$log_std_log_F = NULL
+  t.U$logit_F_age <- NULL
+  t.U$logit_F_year <- NULL
+  t.U$log_std_pe <- NULL
+  t.U$logit_log_R <- NULL
+}
 upper <- unlist(t.U)
+
 ## random effects;
-rname <- c("log_Rec_dev", "log_F_dev", "logq")
+rname <- c("log_Rec_dev", "log_F_dev", "logq", "pe")
 
 obj <- MakeADFun(tmb_data, parameters,
   random = rname, DLL = "fit_mess", map = map,
@@ -170,13 +179,14 @@ obj <- MakeADFun(tmb_data, parameters,
   inner.control = list(maxit = 500, trace = F)
 )
 
+# check the number of parameters
 length(obj$par)
 length(lower)
 length(upper)
 
 obj$fn(obj$par)
 
-# obj$gr(obj$par)
+obj$gr(obj$par) # check gradient 
 
 opt <- nlminb(obj$par, obj$fn, obj$gr,
   lower = lower, upper = upper,
