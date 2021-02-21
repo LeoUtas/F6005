@@ -18,10 +18,11 @@ L95c <- 22
 b1c <- log(0.95 / 0.05) / (L95c - L50c)
 boc <- -b1c * L50c
 ql <- 5 * exp(boc + b1c * tmb_data$len_mid) / (1 + exp(boc + b1c * tmb_data$len_mid))
-# plot(tmb_data$len_mid,ql,xlab='Length (cm)',ylab='Catchability length pattern',type='l',lwd=2)
+plot(tmb_data$len_mid,ql,xlab='Length (cm)',ylab='Catchability length pattern',type='l',lwd=2)
 
 A <- tmb_data$A
 Y <- tmb_data$Y
+C <- 25
 
 parameters <- list(
   # for pla_func()
@@ -67,7 +68,7 @@ parameters.L <- list(
   log_cv_len = log(.01),
 
   # for computing F
-  log_std_log_F = log(0.01),
+  log_std_log_F = log(.01),
   logit_F_age = -5,
   logit_F_year = -5,
   log_F_main = -10,
@@ -149,8 +150,8 @@ map <- list(
 t.L <- parameters.L
 {
   t.L$log_len_o <- NULL
-  t.L$log_vbk = NULL
-  t.L$log_std_log_F = NULL
+  t.L$log_vbk <- NULL
+  t.L$log_std_log_F <- NULL
   t.L$logit_F_age <- NULL
   t.L$logit_F_year <- NULL
   t.L$log_std_pe <- NULL
@@ -161,8 +162,8 @@ lower <- unlist(t.L)
 t.U <- parameters.U
 {
   t.U$log_len_o <- NULL
-  t.U$log_vbk = NULL
-  t.U$log_std_log_F = NULL
+  t.U$log_vbk <- NULL
+  t.U$log_std_log_F <- NULL
   t.U$logit_F_age <- NULL
   t.U$logit_F_year <- NULL
   t.U$log_std_pe <- NULL
@@ -186,7 +187,7 @@ length(upper)
 
 obj$fn(obj$par)
 
-obj$gr(obj$par) # check gradient 
+obj$gr(obj$par) # check gradient
 
 opt <- nlminb(obj$par, obj$fn, obj$gr,
   lower = lower, upper = upper,
@@ -211,3 +212,6 @@ CLc.vec[ind, ]
 
 ind1 <- CLc.vec$Year == 2019
 CLc.vec[ind1, ]
+
+
+obj$env$last.par.best
