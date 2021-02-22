@@ -10,19 +10,20 @@ library(TMB)
 compile("fit_mess.cpp", PKG_CXXFLAGS = "-Wno-ignored-attributes")
 
 dyn.load("fit_mess")
-dyn.unload("fit_origin")
+dyn.unload("fit_mess")
 
 ## set FRV length pattern in catchability;
 L50c <- 17
 L95c <- 22
 b1c <- log(0.95 / 0.05) / (L95c - L50c)
 boc <- -b1c * L50c
-ql <- 5 * exp(boc + b1c * tmb_data$len_mid) / (1 + exp(boc + b1c * tmb_data$len_mid))
-plot(tmb_data$len_mid,ql,xlab='Length (cm)',ylab='Catchability length pattern',type='l',lwd=2)
+ql <- exp(boc + b1c * tmb_data$len_mid) / (1 + exp(boc + b1c * tmb_data$len_mid))
+plot(tmb_data$len_mid, ql, xlab = "Length (cm)", ylab = "Catchability length pattern", type = "l", lwd = 2)
+abline(v = 22, col = "red", lty = 2)
+abline(h = .95, col = "red", lty = 2)
 
 A <- tmb_data$A
 Y <- tmb_data$Y
-C <- 25
 
 parameters <- list(
   # for pla_func()
@@ -60,7 +61,7 @@ parameters <- list(
 parameters$log_N0 <- parameters$log_meanR - 0.2 * (1:(A - 1))
 # not estimating correlation in rec_devs or any process error at first
 
-parameters.L <- list(
+parameters_L <- list(
   # for pla_func()
   log_Linf = log(20),
   log_vbk = log(.01),
@@ -88,7 +89,7 @@ parameters.L <- list(
   log_std_catch = log(.01)
 )
 
-parameters.U <- list(
+parameters_U <- list(
   # for pla_func()
   log_Linf = log(100),
   log_vbk = log(.8),
@@ -116,12 +117,12 @@ parameters.U <- list(
   log_std_catch = log(2)
 )
 
-lower <- unlist(parameters.L)
-upper <- unlist(parameters.U)
+lower <- unlist(parameters_L)
+upper <- unlist(parameters_U)
 
-ql.map <- 1:length(ql)
-ql.map[ql.map > 45] <- 45
-ql.map[ql.map <= 3] <- NA
+ql_map <- 1:length(ql)
+ql_map[ql_map > 45] <- 45
+ql_map[ql_map <= 3] <- NA
 
 pdat <- expand.grid(age = 3:tmb_data$A, year = unique(CLc_vec$Year))
 pdat$age[pdat$age > 9] <- 9
@@ -133,7 +134,7 @@ log_F_dev_map <- matrix(F_map, nrow = A - 2, ncol = Y, byrow = F)
 
 ### fix some parameters in TMB model ###
 
-## first run with log_std_log_F fixed to get starting values;
+## first run with everything fixed to get starting values;
 map <- list(
   log_len_o = factor(NA),
   log_vbk = factor(NA),
@@ -143,33 +144,33 @@ map <- list(
   log_std_pe = factor(NA),
   logit_log_R = factor(NA),
   pe = factor(matrix(NA, nrow = A - 1, ncol = Y - 1, byrow = T)),
-  logq = factor(ql.map),
+  logq = factor(ql_map),
   log_F_dev = factor(log_F_dev_map)
 )
 
-t.L <- parameters.L
+t_L <- parameters_L
 {
-  t.L$log_len_o <- NULL
-  t.L$log_vbk <- NULL
-  t.L$log_std_log_F <- NULL
-  t.L$logit_F_age <- NULL
-  t.L$logit_F_year <- NULL
-  t.L$log_std_pe <- NULL
-  t.L$logit_log_R <- NULL
+  t_L$log_len_o <- NULL
+  t_L$log_vbk <- NULL
+  t_L$log_std_log_F <- NULL
+  t_L$logit_F_age <- NULL
+  t_L$logit_F_year <- NULL
+  t_L$log_std_pe <- NULL
+  t_L$logit_log_R <- NULL
 }
-lower <- unlist(t.L)
+lower <- unlist(t_L)
 
-t.U <- parameters.U
+t_U <- parameters_U
 {
-  t.U$log_len_o <- NULL
-  t.U$log_vbk <- NULL
-  t.U$log_std_log_F <- NULL
-  t.U$logit_F_age <- NULL
-  t.U$logit_F_year <- NULL
-  t.U$log_std_pe <- NULL
-  t.U$logit_log_R <- NULL
+  t_U$log_len_o <- NULL
+  t_U$log_vbk <- NULL
+  t_U$log_std_log_F <- NULL
+  t_U$logit_F_age <- NULL
+  t_U$logit_F_year <- NULL
+  t_U$log_std_pe <- NULL
+  t_U$logit_log_R <- NULL
 }
-upper <- unlist(t.U)
+upper <- unlist(t_U)
 
 ## random effects;
 rname <- c("log_Rec_dev", "log_F_dev", "logq", "pe")
@@ -194,10 +195,12 @@ opt <- nlminb(obj$par, obj$fn, obj$gr,
   control = list(trace = 0, iter.max = 100, eval.max = 10000)
 )
 
+opt$objective
+
 cbind(lower, opt$par, upper)
 
 rep <- obj$report()
-sd.rep <- sdreport(obj)
+sd_rep <- sdreport(obj)
 
 ###########  Do the Plotting ##################
 

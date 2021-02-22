@@ -309,6 +309,7 @@ Type objective_function<Type>::operator()()
   REPORT(NLs);
   REPORT(CNA);
   REPORT(CL);
+  REPORT(log_N0);
   REPORT(N_matrix);
   REPORT(Ns);
   REPORT(B_matrix);

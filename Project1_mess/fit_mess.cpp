@@ -96,7 +96,7 @@ Type objective_function<Type>::operator()()
   DATA_VECTOR(log_catch);
   DATA_MATRIX(M);
 
-  int n = log_index.size();
+  int ni = log_index.size();
   int nc = log_catch.size();
   Type zero = 0.0;
   Type one = 1.0;
@@ -157,7 +157,7 @@ Type objective_function<Type>::operator()()
 
   // for predicted survey index
   Type std_index = exp(log_std_index);
-  Type std_logq = exp(log_std_logq);
+  Type std_logq = exp(log_std_logq); // something can be revised here std_logq_vec ?
 
   // for predicted catch
   Type std_catch = exp(log_std_catch);
@@ -182,10 +182,10 @@ Type objective_function<Type>::operator()()
   vector<Type> ssb(Y);
 
   // for predicted survey index
-  vector<Type> Elog_index(n);
-  vector<Type> E_index(n);
-  vector<Type> resid_index(n);
-  vector<Type> std_resid_index(n);
+  vector<Type> Elog_index(ni);
+  vector<Type> E_index(ni);
+  vector<Type> resid_index(ni);
+  vector<Type> std_resid_index(ni);
 
   // for predicted catch
   vector<Type> E_catch(nc);
@@ -230,19 +230,19 @@ Type objective_function<Type>::operator()()
   nll += SCALE(SEPARABLE(AR1(phi_F_year), AR1(phi_F_age)), std_log_F)(log_F_dev1);
   // matrix exp() does not work
 
-  // *** the cohort model ***;
+  // *** the cohort model ***
 
   vector<Type> log_Rec = log_Rec_dev + log_meanR;
   //initializing log numbers in  first year
-  log_N(0, 0) = log_Rec(0);
+  log_N(0, 0) = log_Rec(0); // log_Rec(0) ~ the number of the 1st age in the 1st year;
   for (i = 1; i < A; ++i)
   {
-    log_N(i, 0) = log_N0(i - 1);
+    log_N(i, 0) = log_N0(i - 1); // log_N) ~ the number of age i in the 1st year;
   }
   //compute log numbers at age
   for (j = 1; j < Y; ++j)
   {
-    log_N(0, j) = log_Rec(j);
+    log_N(0, j) = log_Rec(j); // log_Rec(j) ~ the number of 1st age in year j;
     for (i = 1; i < A; ++i)
     {
       if (i < A - 1)
@@ -279,34 +279,34 @@ Type objective_function<Type>::operator()()
     }
   }
   //compute beginning of year pop num@len (NL), catch@len (CL), and survey num@len (NLs);
-  NL = pla * N_matrix;
+  NL = pla * N_matrix; //
   // for CL should use pla for mid year;
-  CL = pla * CNA;
+  CL = pla * CNA; // ? should use pc = P(l, age + .5)
   // for Nls should use pla for time of year, sf;
-  NLs = pla * Ns;
+  NLs = pla * Ns; // ? should use psf = P(l,age + sf)
   matrix<Type> log_NLs = log(NLs.array());
 
   //compute biomass, catch biomass and ssb @ len, and total biomass and ssb;
-  matrix<Type> B_matrix = weight.array() * NL.array();      // survey weight at length for years;
-  matrix<Type> CB_matrix = weight.array() * CL.array();     // catch at length in weight for years;
-  matrix<Type> SSB_matrix = mat.array() * B_matrix.array(); // revise SSB (use female only);
-  biomass = B_matrix.colwise().sum();
-  ssb = SSB_matrix.colwise().sum();
-  vector<Type> catch_biomass = CB_matrix.colwise().sum();
+  matrix<Type> B_matrix = weight.array() * NL.array();      // stock biomass (in weight) at length for years;
+  matrix<Type> CB_matrix = weight.array() * CL.array();     // catch (in weight) at length for years;
+  matrix<Type> SSB_matrix = mat.array() * B_matrix.array(); // should revise SSB (use female only);
+  biomass = B_matrix.colwise().sum();                       // stock biomass (sum of biomass at length) over years;
+  ssb = SSB_matrix.colwise().sum();                         // sum of SSB at length over years;
+  vector<Type> catch_biomass = CB_matrix.colwise().sum();   // sum of catch (in weight) at length over years;
   vector<Type> harvest_rate = catch_biomass / biomass;
 
-  // ssb relative to average, just FYI;
+  // ssb relative SSB to average, just FYI;
   vector<Type> rssb = Y * ssb / sum(ssb);
-  vector<Type> q = exp(logq);
 
   // *** calculate model predicted survey index and residuals ***
+  vector<Type> q = exp(logq);
 
-  for (i = 0; i < n; ++i)
+  for (i = 0; i < ni; ++i)
   {
     E_index(i) = 0.0;
     for (j = FRV_ilen1(i); j <= FRV_ilen2(i); ++j)
     {
-      E_index(i) += q(j) * NLs(j, FRV_iyear(i));
+      E_index(i) += q(j) * NLs(j, FRV_iyear(i)); // should incorperate a pe in here;
     }
   }
   Elog_index = log(E_index);
@@ -316,6 +316,12 @@ Type objective_function<Type>::operator()()
   // survey index
   nll -= dnorm(resid_index, zero, std_index, true).sum();
 
+  // nll for catchability ~ logq
+  for (i = 3; i < 45; ++i)
+  {
+    nll -= dnorm(logq(i), logq(i - 1), std_logq, true);
+  }
+
   // *** calculate model predicted catch and residuals ***
 
   for (i = 0; i < nc; ++i)
@@ -323,7 +329,7 @@ Type objective_function<Type>::operator()()
     E_catch(i) = 0.0;
     for (j = CL_ilen1(i); j <= CL_ilen2(i); ++j)
     {
-      E_catch(i) += CL(j, CL_iyear(i));
+      E_catch(i) += CL(j, CL_iyear(i)); // should incorperate a pe in here;
     }
   }
   Elog_catch = log(E_catch);
@@ -333,18 +339,13 @@ Type objective_function<Type>::operator()()
   // nll for predicted catch
   nll -= dnorm(resid_catch, zero, std_catch, true).sum();
 
-  // nll for catchability ~ logq
-  for (i = 3; i < 45; ++i)
-  {
-    nll -= dnorm(logq(i), logq(i - 1), std_logq, true);
-  }
-
   REPORT(pla);
   REPORT(mean_len);
   REPORT(NL);
   REPORT(NLs);
   REPORT(CNA);
   REPORT(CL);
+  REPORT(log_N0);
   REPORT(N_matrix);
   REPORT(Ns);
   REPORT(B_matrix);
@@ -386,6 +387,7 @@ Type objective_function<Type>::operator()()
   REPORT(log_F_main);
   REPORT(log_F_dev);
   REPORT(logq);
+  REPORT(std_logq);
   REPORT(std_len);
   REPORT(mean_len);
 
