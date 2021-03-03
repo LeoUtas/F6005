@@ -13,10 +13,9 @@ compile("sspm_ar1_sd_logC_fixed.cpp", flags = "-Wno-ignored-attributes")
 
 
 dyn.load("sspm_ar1_sd_logC_fixed")
-#dyn.unload("sspm_ar1_sd_logC_est")
+# dyn.unload("sspm_ar1_sd_logC_est")
 
 start_q <- aggregate(tmb_data$index, list(iq = tmb_data$iq), mean)
-
 parameters <- list(
   log_r = log(0.2),
   log_K = log(30),
@@ -24,24 +23,24 @@ parameters <- list(
   log_Po = log(0.6),
   log_Ho = log(0.1),
   log_sd_rw = log(0.2),
-  log_sd_log_index = rep(log(0.3),3),
-  #log_sd_log_index = log(0.3),
+  log_sd_log_index = rep(log(0.3), 3),
+  # log_sd_log_index = log(0.3),
   log_sd_pe = log(0.1),
   logit_ar_pe = log(0.50 / (1 - 0.50)),
   log_sd_logC = log(0.1),
-  log_pe = rep(0, length(tmb.data$C)),
-  log_H_dev = rep(0, length(tmb.data$C) - 1)
+  log_pe = rep(0, length(tmb_data$C)),
+  log_H_dev = rep(0, length(tmb_data$C) - 1)
 )
 
 parameters_L <- list(
   log_r = log(0.1),
   log_K = log(10),
-  log_q = rep(-Inf, length(unique(tmb.data$iq))),
+  log_q = rep(-Inf, length(unique(tmb_data$iq))),
   log_Po = log(0.0001),
   log_Ho = log(0.0001),
   log_sd_rw = log(0.01),
-  log_sd_log_index = rep(log(0.01),length(unique(tmb.data$iq))),
-  #log_sd_log_index = log(0.01),
+  log_sd_log_index = rep(log(0.01), length(unique(tmb_data$iq))),
+  # log_sd_log_index = log(0.01),
   log_sd_pe = log(0.001),
   logit_ar_pe = log(0.01 / (1 - 0.01)),
   log_sd_logC = log(0.02)
@@ -50,12 +49,12 @@ parameters_L <- list(
 parameters_U <- list(
   log_r = log(0.6),
   log_K = log(100),
-  log_q = rep(Inf, length(unique(tmb.data$iq))),
+  log_q = rep(Inf, length(unique(tmb_data$iq))),
   log_Po = log(10),
   log_Ho = log(1),
   log_sd_rw = log(2),
-  log_sd_log_index = rep(log(1),length(unique(tmb.data$iq))),
-  #log_sd_log_index = log(1),
+  log_sd_log_index = rep(log(1), length(unique(tmb_data$iq))),
+  # log_sd_log_index = log(1),
   log_sd_pe = log(0.35),
   logit_ar_pe = log(0.950 / (1 - 0.950)),
   log_sd_logC = Inf
@@ -92,7 +91,7 @@ sspm_fit
 
 system.time(
   sspm_fit <- nlminb(sspm$par, sspm$fn, sspm$gr,
-                     lower = lower, upper = upper,
-                     control = list(trace = 0, iter.max = 5000, eval.max = 10000)
+    lower = lower, upper = upper,
+    control = list(trace = 0, iter.max = 5000, eval.max = 10000)
   )
 )
