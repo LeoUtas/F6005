@@ -1,6 +1,6 @@
 rm(list = ls())
 
-setwd("D:/OneDrive - University of Tasmania/HOANG.Ng84/Education/Hoang.MUN20/Required courses/Fish 6005/labs/F6005/Project1_mess/data")
+setwd("D:/OneDrive - University of Tasmania/HOANG.Ng84/Education/Hoang.MUN20/Required courses/Fish 6005/labs/F6005/Project1_mess3/data")
 
 library(ggplot2)
 library(ggridges)

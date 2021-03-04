@@ -143,22 +143,6 @@ ilen <- as.numeric(factor(len_pop)) - 1
 
 # Remove 2 zero's from Fall RV and 6 zeros or really small values from Campelen
 
-#s1_iyear <- iyear[match(surveyc_vec[[1]]$Year, year)]
-#s1_ilen1 <- ilen[match(surveyc_vec[[1]]$len1, len_pop)]
-#s1_ilen2 <- ilen[match(surveyc_vec[[1]]$len2, len_pop)]
-
-#s2_iyear <- iyear[match(surveyc_vec[[2]]$Year, year)]
-#s2_ilen1 <- ilen[match(surveyc_vec[[2]]$len1, len_pop)]
-#s2_ilen2 <- ilen[match(surveyc_vec[[2]]$len2, len_pop)]
-
-#s3_iyear <- iyear[match(surveyc_vec[[3]]$Year, year)]
-#s3_ilen1 <- ilen[match(surveyc_vec[[3]]$len1, len_pop)]
-#s3_ilen2 <- ilen[match(surveyc_vec[[3]]$len2, len_pop)]
-
-#s4_iyear <- iyear[match(surveyc_vec[[4]]$Year, year)]
-#s4_ilen1 <- ilen[match(surveyc_vec[[4]]$len1, len_pop)]
-#s4_ilen2 <- ilen[match(surveyc_vec[[4]]$len2, len_pop)]
-
 surveyc_vec[[1]]$sname = "FallRV"  
 surveyc_vec[[1]]$sf = 10.5/12    
 surveyc_vec[[2]]$sname = "SprgRV"  
@@ -181,12 +165,6 @@ allSL_vec$ilen2 <- ilen[match(allSL_vec$len2, len_pop)]
 CL_iyear <- iyear[match(CLc_vec$Year, year)]
 CL_ilen1 <- ilen[match(CLc_vec$len1, len_pop)]
 CL_ilen2 <- ilen[match(CLc_vec$len2, len_pop)]
-
-## fraction of year when surveys occurs;
-#sf1 <- 10.5 / 12
-#sf2 <- 5.5 / 12
-#sf3 <- 5.5 / 12
-#sf4 <- 8 / 12
 
 sf = tapply(allSL_vec$sf,allSL_vec$is,unique)
 
