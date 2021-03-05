@@ -14,29 +14,29 @@ L50c <- 17
 L95c <- 22
 b1c <- log(0.95 / 0.05) / (L95c - L50c)
 boc <- -b1c * L50c
-ql <- 1*exp(boc + b1c * tmb_data$len_mid) / (1 + exp(boc + b1c * tmb_data$len_mid))
-plot(tmb_data$len_mid, ql, xlab = "length", ylab = "Catchability Length Pattern", type = "l", lwd = 2)
+ql <- 10*exp(boc + b1c * tmb_data$len_mid) / (1 + exp(boc + b1c * tmb_data$len_mid))
+plot(tmb_data$len_mid, ql, xlab = "length", ylab = "Catchability length pattern", type = "l", lwd = 2)
 
 A <- tmb_data$A
 Y <- tmb_data$Y
 ns <- length(tmb_data$sf)
 
 parameters <- list(
-  log_meanR = 3,
-  log_std_log_R = log(2),
-  log_std_index = rep(log(2), ns),
-  log_std_catch = log(1),
-  log_std_logq = rep(log(1), ns),
-  log_std_pe = log(1),
-  logit_log_R = 1,
+  log_meanR = 6,
+  log_std_log_R = log(1.1),
+  log_std_index = rep(log(1.1), ns),
+  log_std_catch = log(1.01),
+  log_std_logq = rep(log(1.01), ns),
+  log_std_pe = log(1.01),
+  logit_log_R = 3,
   log_Linf = log(35),
   log_vbk = log(0.35),
   log_len_o = log(.5),
   log_cv_len = log(.2),
   log_std_log_F = 1,
-  logit_F_age = 0,
+  logit_F_age = log(1.01),
   logit_F_year = 1,
-  log_F_main = matrix(-7, nrow = A - 2, ncol = Y),
+  log_F_main = matrix(-5, nrow = A - 2, ncol = Y),
   log_N0 = rep(4, A - 1),
   # the random effects;
   log_Rec_dev = rep(0, Y),
@@ -45,49 +45,25 @@ parameters <- list(
   pe = matrix(0, nrow = A - 1, ncol = Y - 1, byrow = T)
 )
 
-# parameters <- list(
-#   log_meanR = 3,
-#   log_std_log_R = log(2),
-#   log_std_index = rep(log(1), ns),
-#   log_std_catch = log(.2),
-#   log_std_logq = rep(0, ns),
-#   log_std_pe = log(0.1),
-#   logit_log_R = -5,
-#   log_Linf = log(35),
-#   log_vbk = log(0.35),
-#   log_len_o = log(.5),
-#   log_cv_len = log(.2),
-#   log_std_log_F = log(.25),
-#   logit_F_age log(0.5/0.5), # # 0
-#   logit_F_year = log(0.75/0.25), # # 1
-#   log_F_main = matrix(log(0.05), nrow = A - 2, ncol = Y),
-#   log_N0 = rep(0, A - 1),
-#   # the random effects;
-#   log_Rec_dev = rep(0, Y),
-#   log_F_dev = matrix(0, nrow = A - 2, ncol = Y),
-#   logq = log(matrix(ql, nrow = ns, ncol = length(ql), byrow = T)),
-#   pe = matrix(0, nrow = A - 1, ncol = Y - 1, byrow = T)
-# )
-
 parameters$log_N0 <- parameters$log_meanR - 0.2 * (1:(A - 1))
 parameters$logq[3, ] <- parameters$logq[3, ] - log(10000)
 
 # not estimating correlation in rec_devs or any process error at first
 parameters_L <- list(
   log_meanR = 1,
-  log_std_log_R = log(1),
-  log_std_index = rep(log(1), ns),
-  log_std_catch = log(.01),
+  log_std_log_R = log(1.01),
+  log_std_index = rep(log(1.01), ns),
+  log_std_catch = log(.1),
   log_std_logq = rep(-Inf, ns),
-  log_std_pe = log(.01),
+  log_std_pe = log(.1),
   logit_log_R = -10,
   log_Linf = log(20),
-  log_vbk = log(0.01),
-  log_len_o = log(.01),
-  log_cv_len = log(.01),
-  log_std_log_F = log(.01),
-  logit_F_age = log(.01),
-  logit_F_year = log(.01),
+  log_vbk = log(1.01),
+  log_len_o = log(1.01),
+  log_cv_len = log(.1),
+  log_std_log_F = log(.1),
+  logit_F_age = log(.1),
+  logit_F_year = log(.1),
   log_F_main = matrix(-Inf, nrow = A - 2, ncol = Y),
   log_N0 = rep(-Inf, A - 1)
 )
@@ -101,8 +77,8 @@ parameters_U <- list(
   log_std_pe = log(10),
   logit_log_R = 10,
   log_Linf = log(100),
-  log_vbk = log(0.5),
-  log_len_o = log(10),
+  log_vbk = log(2),
+  log_len_o = log(2),
   log_cv_len = log(10),
   log_std_log_F = log(10),
   logit_F_age = log(10),
@@ -214,7 +190,7 @@ opt$objective
 
 cbind(lower, opt$par, upper)
 
-save.image(file = "fit17.RData")
+save.image(file = "fit19.RData")
 
 ###########  Do the Plotting ##################
 

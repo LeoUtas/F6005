@@ -452,7 +452,7 @@ Type objective_function<Type>::operator()()
 
   vector<Type> log_rmat_vec = log(rmat_vec); //log relative mature biomass over years;
   vector<Type> log_biomass = log(biomass);
-  vector<Type> log_rmat_vec = log(mat_vec);
+  vector<Type> log_mat_vec = log(mat_vec);
   vector<Type> log_harvest_rate = log(harvest_rate);
 
   ADREPORT(log_biomass);
