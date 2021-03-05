@@ -157,7 +157,7 @@ Type objective_function<Type>::operator()()
   array<Type> Ns(ns, A, Y);
   matrix<Type> CNA(A, Y);
   vector<Type> biomass(Y);
-  vector<Type> ssb(Y);
+  vector<Type> mat_vec(Y);
   vector<Type> Elog_index(n);
   vector<Type> E_index(n);
   vector<Type> resid_index(n);
@@ -255,14 +255,14 @@ Type objective_function<Type>::operator()()
   // recruitment deviations
   nll += SCALE(AR1(phi_logR), std_log_R)(log_Rec_dev);
 
-  // // process error negative loglikelihood term
-  // for (int j = 0; j < Y - 1; ++j)
-  // {
-  //   for (int i = 0; i < A - 1; ++i)
-  //   {
-  //     nll -= dnorm(pe(i, j), zero, std_pe, true);
-  //   }
-  // }
+  // process error negative loglikelihood term
+  for (int j = 0; j < Y - 1; ++j)
+  {
+    for (int i = 0; i < A - 1; ++i)
+    {
+      nll -= dnorm(pe(i, j), zero, std_pe, true);
+    }
+  }
 
   //compute numbers at time of catch at age (CNA)
   for (i = 0; i < A; ++i)
@@ -322,17 +322,17 @@ Type objective_function<Type>::operator()()
     }
   }
 
-  //compute biomass, catch biomass and ssb @ len, and total biomass and ssb;
+  //compute biomass, catch biomass and mature biomass @ len, and total biomass and mature biomass;
   matrix<Type> B_matrix = weight.array() * NL.array();
   matrix<Type> CB_matrix = weight.array() * CL.array();
-  matrix<Type> SSB_matrix = mat.array() * B_matrix.array();
+  matrix<Type> mat_matrix = mat.array() * B_matrix.array();
   biomass = B_matrix.colwise().sum();
-  ssb = SSB_matrix.colwise().sum();
+  mat_vec = mat_matrix.colwise().sum();
   vector<Type> catch_biomass = CB_matrix.colwise().sum();
   vector<Type> harvest_rate = catch_biomass / biomass;
 
-  // ssb relative to average, just FYI;
-  vector<Type> rssb = Y * ssb / sum(ssb);
+  // mature biomass relative to average over years, just FYI;
+  vector<Type> rmat_vec = Y * mat_vec / sum(mat_vec);
 
   // *** Compute predicted survey index & residuals ****;
 
@@ -394,63 +394,70 @@ Type objective_function<Type>::operator()()
   REPORT(plac);
   REPORT(plas);
   REPORT(mean_len);
+  REPORT(log_len_o);
+  REPORT(len_o);
+  REPORT(cv_len);
+  REPORT(Linf);
+  REPORT(vbk);
+  REPORT(po);
+  REPORT(std_len);
+
+  REPORT(log_meanR);
+  REPORT(std_log_R);
+  REPORT(logit_log_R);
+  REPORT(phi_logR);
+  REPORT(log_Rec_dev);
+  REPORT(log_Rec);
+  REPORT(pe);
+  REPORT(std_pe);
+
+  REPORT(log_N0);
+  REPORT(N_matrix);
+  REPORT(Ns);
   REPORT(NL);
   REPORT(NLs);
   REPORT(CNA);
   REPORT(CL);
-  REPORT(N_matrix);
-  REPORT(Ns);
   REPORT(B_matrix);
-  REPORT(SSB_matrix);
+  REPORT(mat_matrix);
   REPORT(CB_matrix);
-  REPORT(Z);
-  REPORT(F);
   REPORT(biomass);
   REPORT(catch_biomass);
+  REPORT(mat_vec);
+  REPORT(rmat_vec);
+
+  REPORT(Z);
+  REPORT(F);
+  REPORT(std_log_F);
+  REPORT(log_F_main);
+  REPORT(phi_F_age);
+  REPORT(phi_F_year);
+  REPORT(logit_F_age);
+  REPORT(logit_F_year);
+  REPORT(log_F_dev);
   REPORT(harvest_rate);
-  REPORT(ssb);
-  REPORT(rssb);
+
   REPORT(Elog_index);
   REPORT(E_index);
   REPORT(resid_index);
   REPORT(std_resid_index);
+  REPORT(std_index);
+  REPORT(std_logq);
+  REPORT(logq);
+
   REPORT(E_catch);
   REPORT(Elog_catch);
   REPORT(resid_catch);
   REPORT(std_resid_catch);
-  REPORT(phi_logR);
 
-  REPORT(log_meanR);
-  REPORT(std_log_R);
-  REPORT(std_index);
-  REPORT(std_log_F);
-  REPORT(std_logq);
-  REPORT(std_pe);
-  REPORT(phi_logR);
-  REPORT(phi_F_age);
-  REPORT(phi_F_year);
-  REPORT(Linf);
-  REPORT(vbk);
-  REPORT(po);
-  REPORT(len_o);
-  REPORT(cv_len);
-  REPORT(log_Rec_dev);
-  REPORT(log_Rec);
-  REPORT(pe);
-  REPORT(log_F_main);
-  REPORT(log_F_dev);
-  REPORT(logq);
-  REPORT(std_len);
-  REPORT(mean_len);
-
-  vector<Type> log_rssb = log(rssb); //log relative ssb;
+  vector<Type> log_rmat_vec = log(rmat_vec); //log relative mature biomass over years;
   vector<Type> log_biomass = log(biomass);
-  vector<Type> log_ssb = log(ssb);
+  vector<Type> log_rmat_vec = log(mat_vec);
   vector<Type> log_harvest_rate = log(harvest_rate);
 
   ADREPORT(log_biomass);
-  ADREPORT(log_ssb);
-  ADREPORT(log_rssb);
+  ADREPORT(log_mat_vec);
+  ADREPORT(log_rmat_vec);
   ADREPORT(log_Rec);
   ADREPORT(log_harvest_rate);
 

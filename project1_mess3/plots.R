@@ -1,14 +1,13 @@
 library(ggplot2)
-#library(reshape2)
-#library(stringr)
 library(ggridges)
 library(gridExtra)
 library(patchwork)
 library(corrplot)
 library(xtable)
-
 library(viridis)
 library(hrbrthemes)
+
+load("fit18.RData")
 
 len_pop <- 1:65
 age_pop <- 1:10
