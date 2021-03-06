@@ -7,7 +7,7 @@ library(xtable)
 library(viridis)
 library(hrbrthemes)
 
-load("fit18.RData")
+load("fit.RData")
 
 len_pop <- 1:65
 age_pop <- 1:10
@@ -83,8 +83,8 @@ for (i in 1:ns) {
   lines(age_pop, rep$mean_len)
   legend("topleft", sname[i], bty = "n")
 }
-mtext(side = 1, line = 0, outer = T, "Age")
-mtext(side = 2, line = 0, outer = T, "Length (cm)")
+mtext(side = 1, line = 0, outer = TRUE, "Age")
+mtext(side = 2, line = 0, outer = TRUE, "Length (cm)")
 
 dev.off()
 
@@ -93,9 +93,9 @@ CLc_vec$ECatch <- 1000 * exp(rep$Elog_catch)
 
 jpeg(file = "figs//Catch_ridges.jpeg", width = 7, height = 8, units = "in", res = 300)
 p1 <- ggplot(CLc_vec) +
-  theme_ridges(grid = T, center_axis_labels = T, font_size = 10) +
+  theme_ridges(grid = TRUE, center_axis_labels = TRUE, font_size = 10) +
   geom_density_ridges(aes(x = Length, y = Year, height = Catch, fill = as.factor(Year)),
-    stat = "identity", scale = 3, alpha = .8, show.legend = F
+    stat = "identity", scale = 3, alpha = .8, show.legend = FALSE
   ) +
   scale_y_continuous(breaks = 1990:2019, expand = c(0, 0)) +
   scale_x_continuous(limits = c(20, 40), breaks = c(20, 25, 30, 35, 40, 45), expand = c(0, 0)) +
@@ -109,9 +109,9 @@ p1 <- ggplot(CLc_vec) +
   )
 
 p2 <- ggplot(CLc_vec) +
-  theme_ridges(grid = T, center_axis_labels = T, font_size = 10) +
+  theme_ridges(grid = TRUE, center_axis_labels = TRUE, font_size = 10) +
   geom_density_ridges(aes(x = Length, y = Year, height = ECatch, fill = as.factor(Year)),
-    stat = "identity", scale = 3, alpha = .8, show.legend = F
+    stat = "identity", scale = 3, alpha = .8, show.legend = FALSE
   ) +
   scale_y_continuous(breaks = 1990:2019, expand = c(0, 0)) +
   scale_x_continuous(limits = c(20, 40), breaks = c(20, 25, 30, 35, 40, 45), expand = c(0, 0)) +
@@ -274,16 +274,16 @@ jpeg(file = "figs//Pop.jpeg", width = 7, height = 7, units = "in", res = 300)
 par(mfrow = c(2, 2), oma = c(3, 1, 1, 1), mar = c(0.5, 4, 1, 1), mgp = c(2, 1, 0), cex = 1)
 
 plot(year, exp(rep$log_Rec), type = "l", xlab = "", ylab = "", lwd = 2, las = 1, xaxt = "n")
-mtext(side = 3, line = 0, outer = F, c("Recruitment"))
-plot(year, rep$ssb, type = "l", xlab = "", ylab = "", lwd = 2, las = 1, xaxt = "n")
-mtext(side = 3, line = 0, outer = F, c("SSB(Kt)"))
+mtext(side = 3, line = 0, outer = FALSE, c("Recruitment"))
+plot(year, rep$mat_vec, type = "l", xlab = "", ylab = "", lwd = 2, las = 1, xaxt = "n")
+mtext(side = 3, line = 0, outer = FALSE, c("SSB(Kt)"))
 
 image(year, age_pop, t(rep$N_matrix), xlab = "", ylab = "Age", las = 1)
-mtext(side = 3, line = 0, outer = F, "Numbers at age")
+mtext(side = 3, line = 0, outer = FALSE, "Numbers at age")
 image(year, len_pop, t(rep$NL), xlab = "", ylab = "Length (cm)", las = 1)
-mtext(side = 3, line = 0, outer = F, "Numbers at length")
+mtext(side = 3, line = 0, outer = FALSE, "Numbers at length")
 
-mtext(side = 1, line = 1, outer = T, "Year")
+mtext(side = 1, line = 1, outer = TRUE, "Year")
 
 dev.off()
 
@@ -291,18 +291,19 @@ dev.off()
 ### Biomass plot with CIs ###
 
 ind <- value_names == "log_ssb"
-pdat <- data.frame(year = year, est = exp(sd_rep$value[ind]))
-pdat$L <- exp(sd_rep$value[ind] - qnorm(0.975) * sd_rep$sd[ind])
-pdat$U <- exp(sd_rep$value[ind] + qnorm(0.975) * sd_rep$sd[ind])
-pdat$type <- "SSB"
-
-ind <- value_names == "log_biomass"
 pdat1 <- data.frame(year = year, est = exp(sd_rep$value[ind]))
 pdat1$L <- exp(sd_rep$value[ind] - qnorm(0.975) * sd_rep$sd[ind])
 pdat1$U <- exp(sd_rep$value[ind] + qnorm(0.975) * sd_rep$sd[ind])
-pdat1$type <- "TSB"
+pdat1$type <- "SSB"
+pdat1$est[which(pdat1$year < 2006)] <- NA
 
-pdat <- rbind(pdat, pdat1)
+ind <- value_names == "log_biomass"
+pdat2 <- data.frame(year = year, est = exp(sd_rep$value[ind]))
+pdat2$L <- exp(sd_rep$value[ind] - qnorm(0.975) * sd_rep$sd[ind])
+pdat2$U <- exp(sd_rep$value[ind] + qnorm(0.975) * sd_rep$sd[ind])
+pdat2$type <- "TSB"
+
+pdat <- rbind(pdat1, pdat2)
 
 ylim <- range(pdat$L, pdat$U)
 ylim[2] <- min(ylim[2], max(pdat$est) * 1.5)
@@ -313,7 +314,7 @@ p1 <- ggplot(pdat, aes(x = year, y = est, fill = type, color = type)) +
   geom_line(aes(y = est, group = type, color = type), size = 1) +
   labs(x = "Year", y = "Biomass (Kt)") +
   geom_smooth(aes(ymin = L, ymax = U, fill = type, color = type), stat = "identity", alpha = 0.2) +
-  coord_cartesian(ylim = ylim)
+  coord_cartesian(ylim = ylim) + theme_minimal()
 print(p1)
 
 dev.off()
@@ -347,14 +348,14 @@ jpeg(file = "figs//Catch.jpeg", width = 7, height = 7, units = "in", res = 300)
 par(mfrow = c(2, 2), oma = c(1, 1, 1, 1), mar = c(3, 4, 1, 1), mgp = c(2, 1, 0), cex = 1)
 
 image(year, age_pop, t(rep$F), xlab = "", ylab = "Age", las = 1)
-mtext(side = 3, line = 0.5, outer = F, "F at age")
+mtext(side = 3, line = 0.5, outer = FALSE, "F at age")
 image(year, age_pop, t(rep$Z), xlab = "", ylab = "Age", las = 1)
-mtext(side = 3, line = 0.5, outer = F, "Z at age")
+mtext(side = 3, line = 0.5, outer = FALSE, "Z at age")
 image(year, age_pop, t(rep$CNA), xlab = "", ylab = "Age", las = 1)
-mtext(side = 3, line = 0.5, outer = F, "Catch at age")
+mtext(side = 3, line = 0.5, outer = FALSE, "Catch at age")
 image(year, len_pop, t(rep$CL), xlab = "", ylab = "Length (cm)", las = 1)
-mtext(side = 3, line = 0.5, outer = F, "Catch at Length")
-mtext(side = 1, line = 0, outer = T, "Year")
+mtext(side = 3, line = 0.5, outer = FALSE, "Catch at Length")
+mtext(side = 1, line = 0, outer = TRUE, "Year")
 
 dev.off()
 
@@ -437,9 +438,9 @@ for (i in 1:ns) {
   gname <- paste("figs//details//", sname[i], "_ridges.jpeg", sep = "")
   jpeg(file = gname, width = 6, height = 8, units = "in", res = 300)
   p1 <- ggplot(Sdat) +
-    theme_ridges(grid = T, center_axis_labels = T, font_size = 10) +
+    theme_ridges(grid = TRUE, center_axis_labels = TRUE, font_size = 10) +
     geom_density_ridges(aes(x = Length, y = Year, height = Catch, fill = as.factor(Year)),
-      stat = "identity", scale = 5, alpha = .8, show.legend = F
+      stat = "identity", scale = 5, alpha = .8, show.legend = FALSE
     ) +
     scale_y_continuous(breaks = 1991:2019, expand = c(0, 0)) +
     scale_x_continuous(limits = c(10, 40), breaks = c(10, 15, 20, 25, 30, 35, 40, 45), expand = c(0, 0)) +
@@ -453,9 +454,9 @@ for (i in 1:ns) {
     )
 
   p2 <- ggplot(Sdat) +
-    theme_ridges(grid = T, center_axis_labels = T, font_size = 10) +
+    theme_ridges(grid = TRUE, center_axis_labels = TRUE, font_size = 10) +
     geom_density_ridges(aes(x = Length, y = Year, height = ECatch, fill = as.factor(Year)),
-      stat = "identity", scale = 5, alpha = .8, show.legend = F
+      stat = "identity", scale = 5, alpha = .8, show.legend = FALSE
     ) +
     scale_y_continuous(breaks = 1991:2019, expand = c(0, 0)) +
     scale_x_continuous(limits = c(10, 40), breaks = c(10, 15, 20, 25, 30, 35, 40, 45), expand = c(0, 0)) +
@@ -510,7 +511,6 @@ for (i in 1:ns) {
   dev.off()
 }
 
-
 ####################  Table #################################;
 
 np <- length(opt$par)
@@ -552,7 +552,7 @@ file = "figs//model_output.doc", caption.placement = "top",
 sanitize.rownames.function = tf
 )
 
-vnames <- c("log_biomass", "log_ssb", "log_Rec", "log_harvest_rate")
+vnames <- c("log_biomass", "log_mat_vec", "log_Rec", "log_harvest_rate")
 
 out_tab <- matrix(NA, tmb_data$Y, 8)
 for (i in 1:4) {
@@ -581,4 +581,3 @@ type = "html",
 file = "figs//stock_table.doc", caption.placement = "top",
 sanitize.rownames.function = tf
 )
-

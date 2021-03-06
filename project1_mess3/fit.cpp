@@ -89,6 +89,7 @@ Type objective_function<Type>::operator()()
   DATA_IVECTOR(is); //indicator for survey;
   DATA_MATRIX(weight);
   DATA_MATRIX(mat);
+  DATA_VECTOR(sex_ratio);
   DATA_IVECTOR(SL_iyear);
   DATA_IVECTOR(SL_ilen1);
   DATA_IVECTOR(SL_ilen2);
@@ -158,6 +159,7 @@ Type objective_function<Type>::operator()()
   matrix<Type> CNA(A, Y);
   vector<Type> biomass(Y);
   vector<Type> mat_vec(Y);
+  vector<Type> ssb(Y);
   vector<Type> Elog_index(n);
   vector<Type> E_index(n);
   vector<Type> resid_index(n);
@@ -328,11 +330,13 @@ Type objective_function<Type>::operator()()
   matrix<Type> mat_matrix = mat.array() * B_matrix.array();
   biomass = B_matrix.colwise().sum();
   mat_vec = mat_matrix.colwise().sum();
+  ssb = mat_vec * sex_ratio;
   vector<Type> catch_biomass = CB_matrix.colwise().sum();
   vector<Type> harvest_rate = catch_biomass / biomass;
 
-  // mature biomass relative to average over years, just FYI;
-  vector<Type> rmat_vec = Y * mat_vec / sum(mat_vec);
+  // mature biomass and ssb relative to average over years, just FYI;
+  vector<Type> rssb = Y * ssb / sum(ssb);
+  vector<Type> rmat = Y * mat_vec / sum(mat_vec);
 
   // *** Compute predicted survey index & residuals ****;
 
@@ -423,8 +427,9 @@ Type objective_function<Type>::operator()()
   REPORT(CB_matrix);
   REPORT(biomass);
   REPORT(catch_biomass);
+  REPORT(ssb);
   REPORT(mat_vec);
-  REPORT(rmat_vec);
+  REPORT(rmat);
 
   REPORT(Z);
   REPORT(F);
@@ -450,14 +455,16 @@ Type objective_function<Type>::operator()()
   REPORT(resid_catch);
   REPORT(std_resid_catch);
 
-  vector<Type> log_rmat_vec = log(rmat_vec); //log relative mature biomass over years;
+  vector<Type> log_rmat = log(rmat); //log relative mature biomass over years;
   vector<Type> log_biomass = log(biomass);
-  vector<Type> log_rmat_vec = log(mat_vec);
+  vector<Type> log_mat_vec = log(mat_vec);
+  vector<Type> log_ssb = log(ssb);
   vector<Type> log_harvest_rate = log(harvest_rate);
 
   ADREPORT(log_biomass);
   ADREPORT(log_mat_vec);
-  ADREPORT(log_rmat_vec);
+  ADREPORT(log_ssb);
+  ADREPORT(log_rmat);
   ADREPORT(log_Rec);
   ADREPORT(log_harvest_rate);
 
