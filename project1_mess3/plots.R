@@ -7,7 +7,7 @@ library(xtable)
 library(viridis)
 library(hrbrthemes)
 
-load("fit28.RData")
+load("fit18.RData")
 
 len_pop <- 1:65
 age_pop <- 1:10
@@ -275,7 +275,7 @@ par(mfrow = c(2, 2), oma = c(3, 1, 1, 1), mar = c(0.5, 4, 1, 1), mgp = c(2, 1, 0
 
 plot(year, exp(rep$log_Rec), type = "l", xlab = "", ylab = "", lwd = 2, las = 1, xaxt = "n")
 mtext(side = 3, line = 0, outer = F, c("Recruitment"))
-plot(year, rep$mat_vec, type = "l", xlab = "", ylab = "", lwd = 2, las = 1, xaxt = "n")
+plot(year, rep$ssb, type = "l", xlab = "", ylab = "", lwd = 2, las = 1, xaxt = "n")
 mtext(side = 3, line = 0, outer = F, c("SSB(Kt)"))
 
 image(year, age_pop, t(rep$N_matrix), xlab = "", ylab = "Age", las = 1)
@@ -290,7 +290,7 @@ dev.off()
 
 ### Biomass plot with CIs ###
 
-ind <- value_names == "log_mat_vec"
+ind <- value_names == "log_ssb"
 pdat <- data.frame(year = year, est = exp(sd_rep$value[ind]))
 pdat$L <- exp(sd_rep$value[ind] - qnorm(0.975) * sd_rep$sd[ind])
 pdat$U <- exp(sd_rep$value[ind] + qnorm(0.975) * sd_rep$sd[ind])
@@ -552,7 +552,7 @@ file = "figs//model_output.doc", caption.placement = "top",
 sanitize.rownames.function = tf
 )
 
-vnames <- c("log_biomass", "log_mat_vec", "log_Rec", "log_harvest_rate")
+vnames <- c("log_biomass", "log_ssb", "log_Rec", "log_harvest_rate")
 
 out_tab <- matrix(NA, tmb_data$Y, 8)
 for (i in 1:4) {
