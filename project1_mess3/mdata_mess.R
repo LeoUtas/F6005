@@ -12,7 +12,7 @@ load("data\\3LN_redfish.RData")
 
 ns <- length(survey)
 year <- 1990:2019
-len_pop <- 1:65 
+len_pop <- 1:65
 age_pop <- 1:10 # consider change age >10
 
 Y <- length(year)
@@ -64,8 +64,10 @@ for (i in 1:ns) {
   surveyc_vec[[i]]$len1 <- surveyc_vec[[i]]$Length
   surveyc_vec[[i]]$len2 <- surveyc_vec[[i]]$Length
   surveyc_vec[[i]]$len1[surveyc_vec[[i]]$len1 == lenbar[[i]][1]] <- index_len_lo[[i]]
-  surveyc_vec[[i]]$len2[surveyc_vec[[i]]$len2 == lenbar[[i]][2]] <- index_len_hi[[i]]      
-  if(i >2){surveyc_vec[[i]]$len2 <- surveyc_vec[[i]]$len2+1} ; # I am assuming this is how the 2cm bins work;
+  surveyc_vec[[i]]$len2[surveyc_vec[[i]]$len2 == lenbar[[i]][2]] <- index_len_hi[[i]]
+  if (i > 2) {
+    surveyc_vec[[i]]$len2 <- surveyc_vec[[i]]$len2 + 1
+  }  # I am assuming this is how the 2cm bins work;
 
   lens[[i]] <- sort(unique(survey_vec[[i]]$Length))
 }
@@ -117,6 +119,8 @@ mat_matrix <- cbind(
   matrix(pmat2, nrow = L, ncol = length(1996:2019), byrow = FALSE)
 )
 
+
+
 ############### Mortality #################################;
 
 ## Miller and Hyun (2017) natural mortality - this is age x year like fishing mortality
@@ -143,20 +147,21 @@ ilen <- as.numeric(factor(len_pop)) - 1
 
 # Remove 2 zero's from Fall RV and 6 zeros or really small values from Campelen
 
-surveyc_vec[[1]]$sname = "FallRV"  
-surveyc_vec[[1]]$sf = 10.5/12    
-surveyc_vec[[2]]$sname = "SprgRV"  
-surveyc_vec[[2]]$sf = 5.5/12      
-surveyc_vec[[3]]$sname = "Spsh3L"  
-surveyc_vec[[3]]$sf = 8/12     
-surveyc_vec[[4]]$sname = "Spsh3N"  
-surveyc_vec[[4]]$sf = 5.5/12
+surveyc_vec[[1]]$sname <- "FallRV"
+surveyc_vec[[1]]$sf <- 10.5 / 12
+surveyc_vec[[2]]$sname <- "SprgRV"
+surveyc_vec[[2]]$sf <- 5.5 / 12
+surveyc_vec[[3]]$sname <- "Spsh3L"
+surveyc_vec[[3]]$sf <- 8 / 12
+surveyc_vec[[4]]$sname <- "Spsh3N"
+surveyc_vec[[4]]$sf <- 5.5 / 12
 
-allSL_vec = rbind(surveyc_vec[[1]],surveyc_vec[[2]],surveyc_vec[[3]],surveyc_vec[[4]])
-allSL_vec$is = as.numeric(as.factor(allSL_vec$sname))-1
-ind1 = (allSL_vec$is==0)&(allSL_vec$Year<=1994)&(allSL_vec$len2<=20); # 1995 FallRV Campelen
-ind2 = (allSL_vec$is==1)&(allSL_vec$Year<=1995)&(allSL_vec$len2<=20) # 1995 SprgRV Engel
-allSL_vec = subset(allSL_vec,!(ind1|ind2)) 
+allSL_vec <- rbind(surveyc_vec[[1]], surveyc_vec[[2]], surveyc_vec[[3]], surveyc_vec[[4]])
+allSL_vec$is <- as.numeric(as.factor(allSL_vec$sname)) - 1
+ind1 <- (allSL_vec$is == 0) & (allSL_vec$Year <= 1994) & (allSL_vec$len2 <= 20)
+# 1995 FallRV Campelen
+ind2 <- (allSL_vec$is == 1) & (allSL_vec$Year <= 1995) & (allSL_vec$len2 <= 20) # 1995 SprgRV Engel
+allSL_vec <- subset(allSL_vec, !(ind1 | ind2))
 
 allSL_vec$iyear <- iyear[match(allSL_vec$Year, year)]
 allSL_vec$ilen1 <- ilen[match(allSL_vec$len1, len_pop)]
@@ -166,7 +171,10 @@ CL_iyear <- iyear[match(CLc_vec$Year, year)]
 CL_ilen1 <- ilen[match(CLc_vec$len1, len_pop)]
 CL_ilen2 <- ilen[match(CLc_vec$len2, len_pop)]
 
-sf = tapply(allSL_vec$sf,allSL_vec$is,unique)
+sf <- tapply(allSL_vec$sf, allSL_vec$is, unique)
+
+F_ratio <- c(rep(mean(sex_ratio$F), 16), sex_ratio$F)
+juv_ratio <- c(rep(mean(sex_ratio$I), 16), sex_ratio$I)
 
 tmb_data <- list(
   A = A,
@@ -177,7 +185,7 @@ tmb_data <- list(
   len_border = len_border,
 
   log_index = log(allSL_vec$Catch / 1000),
-  sf = sf,  
+  sf = sf,
   is = allSL_vec$is,
 
   weight = wt_mat[1:L, ],
@@ -191,7 +199,10 @@ tmb_data <- list(
   CL_ilen1 = CL_ilen1,
   CL_ilen2 = CL_ilen2,
   log_catch = log(CLc_vec$Catch / 1000),
-  M = M
+  M = M,
+
+  F_ratio = F_ratio,
+  juv_ratio = juv_ratio
 )
 
 save(tmb_data, surveyc_vec, CLc_vec, allSL_vec, file = "tmb_data.RData")

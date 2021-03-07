@@ -145,6 +145,38 @@ jpeg(file = gname, width = 10, height = 8, units = "in", res = 300)
 print(p)
 dev.off()
 
+sex_ratio <- openxlsx::read.xlsx("data.xlsx", sheet = 10)
+
+female = vector()
+male = vector()
+indeterminate = vector()
+for (i in 1:13) {
+female1 =  sum(sex_ratio[,3 + 4* 0])/sum(sex_ratio[,5 + 4 * 0])
+female[i] =  sum(sex_ratio[,3 + 4* i])/sum(sex_ratio[,5 + 4 * i])
+
+male1 =  sum(sex_ratio[,2 + 4* 0])/sum(sex_ratio[,5 + 4 * 0])
+male[i] =  sum(sex_ratio[,2 + 4* i])/sum(sex_ratio[,5 + 4 * i])
+
+indeterminate1 =  sum(sex_ratio[,4 + 4* 0])/sum(sex_ratio[,5 + 4 * 0])
+indeterminate[i] =  sum(sex_ratio[,4 + 4* i])/sum(sex_ratio[,5 + 4 * i])
+}
+sex_ratio = data.frame("year" = c(2006:2019), 
+                       'F' = c(female1, female),
+                       "M" = c(male1, male), 
+                       "I" = c(indeterminate1, indeterminate))
+ 
+total = apply(sex_ratio[,-c(1)],1, sum) # just to test the total of sex_ratio = 1;
+
+sex_ratio_vec = tidyr::gather(sex_ratio, "sex", "value", -year)
+
+jpeg(file = "sex_ratio.jpeg", width = 10, height = 8, units = "in", res = 300)
+p = ggplot(sex_ratio_vec, aes(x = year, y = value, fill = sex)) + 
+  geom_bar(position = "fill", stat = "identity") + 
+  ylab("Proportion") +
+  theme_minimal()
+print(p)
+dev.off()
+
 ############### Weight ~ length #######
 
 year <- 1990:2019
@@ -201,5 +233,6 @@ save(
   wt_mat,
   wt_vec,
   LW_parms,
+  sex_ratio,
   file = "3LN_redfish.RData"
 )

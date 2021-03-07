@@ -89,7 +89,8 @@ Type objective_function<Type>::operator()()
   DATA_IVECTOR(is); //indicator for survey;
   DATA_MATRIX(weight);
   DATA_MATRIX(mat);
-  DATA_VECTOR(sex_ratio);
+  DATA_VECTOR(F_ratio);
+  DATA_VECTOR(juv_ratio);
   DATA_IVECTOR(SL_iyear);
   DATA_IVECTOR(SL_ilen1);
   DATA_IVECTOR(SL_ilen2);
@@ -160,6 +161,7 @@ Type objective_function<Type>::operator()()
   vector<Type> biomass(Y);
   vector<Type> mat_vec(Y);
   vector<Type> ssb(Y);
+  vector<Type> juv(Y);
   vector<Type> Elog_index(n);
   vector<Type> E_index(n);
   vector<Type> resid_index(n);
@@ -330,7 +332,8 @@ Type objective_function<Type>::operator()()
   matrix<Type> mat_matrix = mat.array() * B_matrix.array();
   biomass = B_matrix.colwise().sum();
   mat_vec = mat_matrix.colwise().sum();
-  ssb = mat_vec * sex_ratio;
+  ssb = biomass * F_ratio;
+  juv = biomass * juv_ratio;
   vector<Type> catch_biomass = CB_matrix.colwise().sum();
   vector<Type> harvest_rate = catch_biomass / biomass;
 
@@ -459,11 +462,13 @@ Type objective_function<Type>::operator()()
   vector<Type> log_biomass = log(biomass);
   vector<Type> log_mat_vec = log(mat_vec);
   vector<Type> log_ssb = log(ssb);
+  vector<Type> log_juv = log(juv);
   vector<Type> log_harvest_rate = log(harvest_rate);
 
   ADREPORT(log_biomass);
   ADREPORT(log_mat_vec);
   ADREPORT(log_ssb);
+  ADREPORT(log_juv);
   ADREPORT(log_rmat);
   ADREPORT(log_Rec);
   ADREPORT(log_harvest_rate);

@@ -287,8 +287,14 @@ mtext(side = 1, line = 1, outer = TRUE, "Year")
 
 dev.off()
 
+### Biomass plot with ssb, juvenile and CIs ###
 
-### Biomass plot with CIs ###
+ind <- value_names == "log_juv"
+pdat <- data.frame(year = year, est = exp(sd_rep$value[ind]))
+pdat$L <- exp(sd_rep$value[ind] - qnorm(0.975) * sd_rep$sd[ind])
+pdat$U <- exp(sd_rep$value[ind] + qnorm(0.975) * sd_rep$sd[ind])
+pdat$type <- "Juvenile"
+pdat$est[which(pdat$year < 2006)] <- NA
 
 ind <- value_names == "log_ssb"
 pdat1 <- data.frame(year = year, est = exp(sd_rep$value[ind]))
@@ -303,20 +309,19 @@ pdat2$L <- exp(sd_rep$value[ind] - qnorm(0.975) * sd_rep$sd[ind])
 pdat2$U <- exp(sd_rep$value[ind] + qnorm(0.975) * sd_rep$sd[ind])
 pdat2$type <- "TSB"
 
-pdat <- rbind(pdat1, pdat2)
+pdat <- rbind(pdat, pdat1, pdat2)
 
 ylim <- range(pdat$L, pdat$U)
 ylim[2] <- min(ylim[2], max(pdat$est) * 1.5)
 
 jpeg(file = "figs//biomass.jpeg", width = 5, height = 4, units = "in", res = 300)
-
 p1 <- ggplot(pdat, aes(x = year, y = est, fill = type, color = type)) +
   geom_line(aes(y = est, group = type, color = type), size = 1) +
   labs(x = "Year", y = "Biomass (Kt)") +
   geom_smooth(aes(ymin = L, ymax = U, fill = type, color = type), stat = "identity", alpha = 0.2) +
-  coord_cartesian(ylim = ylim) + theme_minimal()
+  coord_cartesian(ylim = ylim) +
+  theme_minimal()
 print(p1)
-
 dev.off()
 
 ###  Harvest rate plots with CIs ###
