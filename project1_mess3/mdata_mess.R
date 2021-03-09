@@ -67,7 +67,7 @@ for (i in 1:ns) {
   surveyc_vec[[i]]$len2[surveyc_vec[[i]]$len2 == lenbar[[i]][2]] <- index_len_hi[[i]]
   if (i > 2) {
     surveyc_vec[[i]]$len2 <- surveyc_vec[[i]]$len2 + 1
-  }  # I am assuming this is how the 2cm bins work;
+  } # I am assuming this is how the 2cm bins work;
 
   lens[[i]] <- sort(unique(survey_vec[[i]]$Length))
 }
@@ -94,8 +94,23 @@ CLc <- rbind(c(Lo, indexc_lo), CL[indc, ], c(Hi, indexc_hi))
 # CLc[CLc==0]=0.1; ## replace one 0 with a 1
 
 CLc_vec <- vec_func(CLc)
+CLc_vec_org <- CLc_vec
+CLc_vec$id <- c(1:length(CLc_vec_org$Length))
 CLc_vec <- subset(CLc_vec, Year >= min(year))
 CLc_vec <- subset(CLc_vec, Catch > 0.5)
+
+outliers <- as.numeric(row.names(subset(CLc_vec, Year == 2007 & Length == 38 |
+  Year == 1993 & Length == 20 |
+  Year == 2007 & Length == 37 |
+  Year == 1994 & Length == 20)))
+
+CLc_vec <- CLc_vec[!(CLc_vec$id %in% c(
+  outliers[1],
+  outliers[2],
+  outliers[3],
+  outliers[4]
+)), ]
+
 CLc_vec$len1 <- CLc_vec$Length
 CLc_vec$len2 <- CLc_vec$Length
 CLc_vec$len1[CLc_vec$len1 == Lo] <- indexc_len_lo

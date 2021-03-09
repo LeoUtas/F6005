@@ -36,7 +36,7 @@ parameters <- list(
   logit_F_age = log(1.01),
   logit_F_year = 1,
   log_F_main = matrix(log(.05), nrow = A - 2, ncol = Y),
-  log_N0 = rep(1, A - 1),
+  log_N0 = rep(4, A - 1),
   # the random effects;
   log_Rec_dev = rep(0, Y),
   log_F_dev = matrix(0, nrow = A - 2, ncol = Y),
@@ -189,7 +189,21 @@ opt$objective
 
 cbind(lower, opt$par, upper)
 
-save.image(file = "fit.RData")
+save.image(file = "fit_qlprior_off.RData")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ###########  Do the Plotting ##################
 

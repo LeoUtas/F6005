@@ -376,10 +376,10 @@ Type objective_function<Type>::operator()()
     }
   }
 
-  //seem q and N are confounded; so I am adding medium priors on Fall RV q (len=20,22, 24) approx 1
-  nll -= dnorm(logq(0, 19), zero, Type(0.2), true);
-  nll -= dnorm(logq(0, 21), zero, Type(0.2), true);
-  nll -= dnorm(logq(0, 23), zero, Type(0.2), true);
+  // // seem q and N are confounded; so I am adding medium priors on Fall RV q (len=20,22, 24) approx 1
+  // nll -= dnorm(logq(0, 19), zero, Type(0.2), true);
+  // nll -= dnorm(logq(0, 21), zero, Type(0.2), true);
+  // nll -= dnorm(logq(0, 23), zero, Type(0.2), true);
 
   // *** Compute predicted catch and residuals *** ;
   for (i = 0; i < nc; ++i)

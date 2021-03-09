@@ -1,0 +1,33 @@
+<!-- html table generated in R 4.0.3 by xtable 1.8-4 package -->
+<!-- Mon Mar 08 12:42:57 2021 -->
+<table border=1>
+<caption align="top"> Model results, nll = 3871, AIC = 7796, BIC = 7955.67 </caption>
+<tr> <th>  </th> <th> 1 </th> <th> 2 </th>  </tr>
+  <tr> <td> meanR </td> <td align="right"> 584.54 </td> <td align="right"> 0.2 </td> </tr>
+  <tr> <td> std_log_R </td> <td align="right"> 1.07 </td> <td align="right"> 0.1 </td> </tr>
+  <tr> <td> std_index_FallRV </td> <td align="right"> 1.01 </td> <td align="right"> 0.0 </td> </tr>
+  <tr> <td> std_index_SprgRV </td> <td align="right"> 1.01 </td> <td align="right"> 0.0 </td> </tr>
+  <tr> <td> std_index_Spsh3L </td> <td align="right"> 1.01 </td> <td align="right"> 0.1 </td> </tr>
+  <tr> <td> std_index_Spsh3N </td> <td align="right"> 1.50 </td> <td align="right"> 0.0 </td> </tr>
+  <tr> <td> std_catch </td> <td align="right"> 0.35 </td> <td align="right"> 0.1 </td> </tr>
+  <tr> <td> std_logq_FallRV </td> <td align="right"> 0.51 </td> <td align="right"> 0.2 </td> </tr>
+  <tr> <td> std_logq_SprgRV </td> <td align="right"> 0.43 </td> <td align="right"> 0.2 </td> </tr>
+  <tr> <td> std_logq_Spsh3L </td> <td align="right"> 0.53 </td> <td align="right"> 0.3 </td> </tr>
+  <tr> <td> std_logq_Spsh3N </td> <td align="right"> 1.02 </td> <td align="right"> 0.3 </td> </tr>
+  <tr> <td> Linf </td> <td align="right"> 48.69 </td> <td align="right"> 0.0 </td> </tr>
+  <tr> <td> vbk </td> <td align="right"> 0.13 </td> <td align="right"> 0.0 </td> </tr>
+  <tr> <td> len_o </td> <td align="right"> 0.01 </td> <td align="right"> 5.4 </td> </tr>
+  <tr> <td> cv_len </td> <td align="right"> 0.09 </td> <td align="right"> 0.0 </td> </tr>
+  <tr> <td> std_log_F </td> <td align="right"> 2.45 </td> <td align="right"> 0.1 </td> </tr>
+  <tr> <td> F_main </td> <td align="right"> 0.00 </td> <td align="right"> 0.7 </td> </tr>
+  <tr> <td> F_main.1 </td> <td align="right"> 0.00 </td> <td align="right"> 0.8 </td> </tr>
+  <tr> <td> N0_3 </td> <td align="right"> 118.33 </td> <td align="right"> 0.3 </td> </tr>
+  <tr> <td> N0_4 </td> <td align="right"> 114.17 </td> <td align="right"> 0.2 </td> </tr>
+  <tr> <td> N0_5 </td> <td align="right"> 91.97 </td> <td align="right"> 0.2 </td> </tr>
+  <tr> <td> N0_6 </td> <td align="right"> 57.34 </td> <td align="right"> 0.3 </td> </tr>
+  <tr> <td> N0_7 </td> <td align="right"> 47.18 </td> <td align="right"> 0.4 </td> </tr>
+  <tr> <td> N0_8 </td> <td align="right"> 50.52 </td> <td align="right"> 0.5 </td> </tr>
+  <tr> <td> N0_9 </td> <td align="right"> 65.15 </td> <td align="right"> 0.6 </td> </tr>
+  <tr> <td> N0_10 </td> <td align="right"> 95.39 </td> <td align="right"> 0.6 </td> </tr>
+  <tr> <td> N0_3.1 </td> <td align="right"> 787.00 </td> <td align="right"> 0.2 </td> </tr>
+   </table>

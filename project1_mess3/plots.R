@@ -7,7 +7,7 @@ library(xtable)
 library(viridis)
 library(hrbrthemes)
 
-load("fit.RData")
+load("fit_outliers_fixed.RData")
 
 len_pop <- 1:65
 age_pop <- 1:10
@@ -53,14 +53,10 @@ corr_matrix <- diag(1 / dsd) %*% sd_rep$cov.fixed %*% diag(1 / dsd)
 rownames(corr_matrix) <- names(dsd)
 colnames(corr_matrix) <- names(dsd)
 
-
 jpeg(file = "figs//corr_parm.jpeg", width = 7, height = 7, units = "in", res = 300)
 par(mar = c(0, 5, 0, 1))
-
 corrplot.mixed(corr_matrix, tl.pos = "lt", tl.srt = 45, tl.cex = 0.6, cl.cex = 0.75, tl.col = "black", number.cex = 0.5)
-
 dev.off()
-
 
 ## plot of proportion at length for each age;
 # jpeg(file='figs//PLA.jpeg',width=5,height=5,units='in',res=300)
@@ -275,7 +271,7 @@ par(mfrow = c(2, 2), oma = c(3, 1, 1, 1), mar = c(0.5, 4, 1, 1), mgp = c(2, 1, 0
 
 plot(year, exp(rep$log_Rec), type = "l", xlab = "", ylab = "", lwd = 2, las = 1, xaxt = "n")
 mtext(side = 3, line = 0, outer = FALSE, c("Recruitment"))
-plot(year, rep$mat_vec, type = "l", xlab = "", ylab = "", lwd = 2, las = 1, xaxt = "n")
+plot(year, rep$ssb, type = "l", xlab = "", ylab = "", lwd = 2, las = 1, xaxt = "n")
 mtext(side = 3, line = 0, outer = FALSE, c("SSB(Kt)"))
 
 image(year, age_pop, t(rep$N_matrix), xlab = "", ylab = "Age", las = 1)
@@ -586,3 +582,36 @@ type = "html",
 file = "figs//stock_table.doc", caption.placement = "top",
 sanitize.rownames.function = tf
 )
+
+#################### process error #################################;
+
+pe <- data.frame("age" = c(1:9), rep$pe)
+names(pe) <- c("age", 1991:2019)
+pe_vec <- tidyr::gather(pe, "year", "value", -age)
+pe_vec$year <- as.numeric(pe_vec$year)
+
+jpeg(file = "figs//pe_age.jpeg", width = 6, height = 8, units = "in", res = 300)
+
+p1 <- ggplot(pe_vec, aes(x = year, y = value)) +
+  geom_point() +
+  geom_segment(aes(x = year, xend = year, y = 0, yend = value), color = "#3182bd") +
+  scale_x_continuous(breaks = seq(1991, 2019, 8)) +
+  ylab("process error") +
+  facet_wrap(~age) +
+  theme_minimal()
+print(p1)
+
+dev.off()
+
+jpeg(file = "figs//pe_year.jpeg", width = 6, height = 8, units = "in", res = 300)
+
+p2 <- ggplot(pe_vec, aes(x = age, y = value)) +
+  geom_point() +
+  geom_segment(aes(x = age, xend = age, y = 0, yend = value), color = "#3182bd") +
+  scale_x_continuous(breaks = seq(1, 9, 2)) +
+  ylab("process error") +
+  facet_wrap(~year) +
+  theme_minimal()
+print(p2)
+
+dev.off()
