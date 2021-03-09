@@ -27,16 +27,16 @@ parameters <- list(
   log_std_catch = log(1.01),
   log_std_logq = rep(log(1.01), ns),
   log_std_pe = log(1.01),
-  logit_log_R = 2,
+  logit_log_R = 3,
   log_Linf = log(35),
   log_vbk = log(0.35),
   log_len_o = log(.5),
-  log_cv_len = log(.2),
+  log_cv_len = log(.1),
   log_std_log_F = 1,
   logit_F_age = log(1.01),
   logit_F_year = 1,
   log_F_main = matrix(log(.05), nrow = A - 2, ncol = Y),
-  log_N0 = rep(4, A - 1),
+  log_N0 = rep(1, A - 1),
   # the random effects;
   log_Rec_dev = rep(0, Y),
   log_F_dev = matrix(0, nrow = A - 2, ncol = Y),
@@ -189,7 +189,7 @@ opt$objective
 
 cbind(lower, opt$par, upper)
 
-save.image(file = "fit28.RData")
+save.image(file = "fit.RData")
 
 ###########  Do the Plotting ##################
 
